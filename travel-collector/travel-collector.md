@@ -50,7 +50,7 @@ tosses them your way. You catch everything, organize it, and keep it ready.
 ### Text Notes
 - Parse free-form text for place names, recommendations, tips
 - Handle multiple languages (especially Traditional Chinese, Japanese, Korean, English)
-- Recognize patterns like "A推薦的餐廳" (restaurant recommended by A), "必去" (must-visit), price mentions
+- Recognize patterns like "recommended by A", "must-visit", "must-go", price mentions
 
 ### Multiple Items
 - A single input often contains multiple places/tips (e.g., a blog post listing "Top 10 cafes in Tokyo")
@@ -86,7 +86,7 @@ append-friendly structure — each invocation adds new entries without touching 
       },
       "details": {
         "description": "One-line summary of what this is and why it's interesting",
-        "price": "Price info as text, e.g., '¥1,500/人' or 'Free'",
+        "price": "Price info as text, e.g., '¥1,500/person' or 'Free'",
         "price_value": null,
         "price_currency": "JPY | KRW | USD | TWD | EUR | etc.",
         "hours": "Opening hours if available",
@@ -195,7 +195,7 @@ Continue numbering from the highest existing ID in the file.
 ### Priority Classification
 
 Assign priority based on context clues:
-- **must-visit**: User explicitly says "必去", "must visit", "don't miss", or the source rates it very highly
+- **must-visit**: User explicitly says "must visit", "must-go", "don't miss", or the source rates it very highly
 - **recommended**: Featured prominently in a blog post, high ratings, mentioned multiple times
 - **optional**: Listed as an alternative, "if you have time", lower ratings
 
@@ -233,7 +233,7 @@ Based on input type:
 **Text note provided:**
 ```
 1. Parse for place names, recommendations, prices
-2. Identify the recommender if mentioned ("小明推薦", "my friend said")
+2. Identify the recommender if mentioned ("recommended by X", "my friend said")
 3. Create entries for each distinct recommendation
 4. Note "note" as the source type
 ```
@@ -250,9 +250,9 @@ For each extracted item:
 **Mandatory for food/restaurant items:**
 - Always assign `meal_slot` (lunch / dinner / breakfast / snack)
 - Always generate a `google_maps_url` using the format: `https://www.google.com/maps/search/?api=1&query={URL-encoded name}+{city}`
-- For restaurants that are popular, upscale, have limited seating, or sources mention "要預約" / "reservation recommended" / "予約" / "예약", set `reservation.needed = true`
+- For restaurants that are popular, upscale, have limited seating, or sources mention "reservation recommended" / "reservation required", set `reservation.needed = true`
 - When `reservation.needed = true`, immediately ask the user:
-  - "🔔 {name} 需要訂位！已經訂了嗎？幾點？幾位？"
+  - "Reservation needed for {name}! Have you booked? What time? How many people?"
   - Provide the Google Maps link for easy reference
   - If confirmed, populate `reservation.confirmed`, `reservation.time`, `reservation.party_size`
   - If not yet reserved, add to the confirmation output as a **reservation action item**
@@ -265,12 +265,12 @@ After processing all items, if a trip schedule exists (`trip.json` or similar), 
 
 For any day missing a meal, flag it in the confirmation output:
 ```
-⚠️ 用餐缺口：
-  4/5 — 缺午餐（太宰府+柳川行程中）
-  4/10 — 缺晚餐
+Meal gaps found:
+  4/5 — Missing lunch (during Dazaifu + Yanagawa itinerary)
+  4/10 — Missing dinner
 ```
 
-Suggest: "要不要幫這幾天找餐廳？" so the user can decide.
+Suggest: "Want me to find restaurants for these days?" so the user can decide.
 
 ### Step 4: Update the research file
 
@@ -289,20 +289,20 @@ Added to travel research ({trip_name}):
 {type_emoji} {name} — {description}
    📍 {area/city} | 💰 {price} | ⏰ {hours}
    🔗 [Google Maps]({google_maps_url}) | 🏷️ {priority} | Source: {source_type}
-   {if booking_url: 🎫 [訂票連結]({booking_url})}
+   {if booking_url: 🎫 [Book here]({booking_url})}
 
 (repeat for each item)
 
 --- Reservation Action Items ---
-🔔 需要訂位：
+Reservation needed:
   1. {restaurant_name} — {meal_slot} · [Google Maps]({url})
-     ❓ 已經訂位了嗎？幾點？幾位？
+     Have you booked? What time? How many people?
   (repeat for each reservation-needed item)
 
 --- Meal Gap Warnings ---
-⚠️ 用餐缺口：
-  {date} — 缺{lunch/dinner}（{day_context}）
-  (suggest: "要不要幫這幾天找餐廳？")
+Meal gaps found:
+  {date} — Missing {lunch/dinner} ({day_context})
+  (suggest: "Want me to find restaurants for these days?")
 
 Total items in research: {count}
 ```
@@ -321,10 +321,11 @@ Type emojis:
 
 ## Language Handling
 
-- Detect the user's language from their input
-- All summaries and confirmations should match the user's language
-- Place names should be bilingual when possible (e.g., "太宰府天滿宮 / 太宰府天満宮")
+- **All data written to `travel-research.json` MUST be in English.** Descriptions, tips, notes, and all text fields should be stored in English regardless of the source language. Translate non-English content when extracting.
+- Place names: use the English name as `name` and the local-language name as `name_local` (e.g., `name: "Dazaifu Tenmangu"`, `name_local: "太宰府天満宮"`)
 - Keep the JSON field names in English for consistency
+- Detect the user's language from their input
+- All summaries and confirmations shown to the user should match the user's conversation language
 
 ## Edge Cases
 
@@ -348,13 +349,13 @@ style from the `ui-style` skill. The ui-style skill lives at `/Users/harmony/Doc
 and has 30 professionally crafted design systems.
 
 **How to use:**
-1. Before generating HTML, ask the user: "要用什麼 UI 風格？" and present the top choices relevant
+1. Before generating HTML, ask the user: "What UI style do you want?" and present the top choices relevant
    to the output type (e.g., for data viz: Modern Dark, Swiss Minimalist, Minimal Dark, Cyberpunk)
 2. Read the chosen style's reference file from `ui-style/references/<style-name>.md`
 3. Apply the complete design system: colors, typography, spacing, borders, shadows, animations
 4. Follow the style's anti-patterns (e.g., Swiss Minimalist = zero border-radius, no shadows)
 
-If the user doesn't care or says "隨便", default to **Swiss Minimalist** for data-heavy outputs
+If the user doesn't care or says "whatever" / "you pick", default to **Swiss Minimalist** for data-heavy outputs
 and **Modern Dark** for immersive/visual outputs.
 
 ## Integration with Travel Planner

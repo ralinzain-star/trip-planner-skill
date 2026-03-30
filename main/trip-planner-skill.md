@@ -505,6 +505,14 @@ Use `WebSearch` to find **detailed transit information**. This is critical for r
    - Any useful bus routes, trams, or ferries?
    - Rental bike / scooter options?
 
+7. **Weather forecast for trip dates** (MANDATORY):
+   - Search: `"{destination} weather forecast {month} {year}"`, `"{destination} weather {date range}"`
+   - For each day, collect: high/low temperature, weather condition (sunny/cloudy/rainy), sunrise/sunset times
+   - Identify rainy days and plan indoor activities for those days
+   - Identify clear days and prioritize outdoor/sunset/nature activities
+   - Note seasonal events: cherry blossom timing, festival dates, typhoon season warnings
+   - This data feeds into the `WEATHER_DATA` array in app.js AND informs the route optimization
+
 ### Step 3b: Present Route Plan with Transit Details
 
 Present a **day-by-day route plan** with explicit transit instructions between each stop.
@@ -540,6 +548,16 @@ Present a **day-by-day route plan** with explicit transit instructions between e
 - **Transit pass analysis**: "Today you took 5 subway rides totaling ¥1,100, day pass is ¥600 → buy a day pass and save ¥500!"
 - **Transfer hub highlights**: where to change between areas, with locker/food tips
 - Flag if a day looks too packed (> 5 spots) or too empty (< 2 spots)
+- **Weather-aware scheduling (MANDATORY):**
+  - Research weather forecasts for the destination during the trip dates using WebSearch
+  - Schedule **outdoor attractions** (beaches, parks, viewpoints, hiking) on sunny/clear days
+  - Schedule **indoor attractions** (museums, shopping, arcades, spas) on rainy/overcast days
+  - Move **sunset/sunrise spots** to days with clear weather forecasts
+  - If rain is expected: suggest rain-friendly alternatives and note "☔ Rain expected — indoor activities prioritized"
+  - If a must-visit outdoor spot falls on a rainy day, flag it: "⚠️ Rain forecasted for Day 3 — consider swapping Gwangalli Beach (Day 3) with ARTE Museum (Day 4)"
+  - Store weather data in `WEATHER_DATA` array in app.js (see Overview Tab section) for the generated HTML
+  - When the user asks to adjust itinerary later, **always check weather for the affected days** and give advice:
+    "Day 5 is forecasted sunny ☀️ — great for the outdoor market. Day 6 has rain 🌧️ — better for the museum."
 - **Time conflict detection**: if multiple attractions on the same day are best visited at the
   same time of day (e.g., two "sunset" spots, two "morning only" spots), FLAG IT explicitly:
   "⚠️ Cheongsapo Sunset Bridge and Gwangalli Night View are both best visited at dusk — scheduling both on the same day conflicts, recommend splitting across two days"
@@ -982,6 +1000,14 @@ Post-optimization avg daily travel distance: Y km (save Z%)
 Generate a self-contained HTML file from scratch. Do NOT use any template file — build the entire
 HTML inline using the layout blueprint below and populate it with the researched data.
 
+### Data Language Rule
+
+**All content written to `trip.json` and other data files MUST be in English.** This includes descriptions, tips, notes, and all text fields. Translate non-English source material into English when storing. Place names should have both an English name and a `name_local` field for the local-language name.
+
+### Default Website Language
+
+The default display language of the generated HTML website should be the language used in the conversation between the user and AI. For example, if the user converses in Traditional Chinese, the default language on page load should be `zh`. If in English, default to `en`. If the conversation language cannot be determined, default to `en` (English).
+
 ### Content Language & Currency
 
 **MANDATORY: Full i18n (internationalization) with runtime language switching.**
@@ -990,7 +1016,7 @@ The generated HTML MUST support **4 languages** with a language switcher that tr
 
 #### Required Languages (always all 4)
 
-1. **User's passport language** (e.g., Traditional Chinese for Taiwanese users) — the default
+1. **User's conversation language** (e.g., Traditional Chinese if the user chats in Chinese) — the default (see "Default Website Language" above)
 2. **English** — always included
 3. **Destination country language(s)** — e.g., Korean for Korea, Japanese for Japan
 4. If the trip covers 2+ countries with different languages (e.g., Korea + Japan), include both
@@ -1003,8 +1029,10 @@ Example for a Taiwanese user visiting Korea & Japan: `zh`, `en`, `ko`, `ja`
    ```js
    const I18N = {
      // Navigation
-     nav_attractions: { zh:'Spots', en:'Spots', ko:'Spots (ko)', ja:'Spots (ja)' },
+     nav_attractions: { zh:'概覽', en:'Overview', ko:'개요', ja:'概要' },
+     nav_time:        { zh:'景點', en:'Spots', ko:'명소', ja:'スポット' },
      nav_calendar:    { zh:'Itinerary', en:'Itinerary', ko:'Itinerary (ko)', ja:'Itinerary (ja)' },
+     nav_more:        { zh:'More', en:'More', ko:'More (ko)', ja:'More (ja)' },
      // Stats
      stat_total:      { zh:'Est. Total', en:'Est. Total', ko:'Est. Total (ko)', ja:'Est. Total (ja)' },
      // Categories
@@ -1020,7 +1048,7 @@ Example for a Taiwanese user visiting Korea & Japan: `zh`, `en`, `ko`, `ja`
 
 2. **`data-i18n` attributes on ALL HTML elements** — every translatable text in index.html:
    ```html
-   <span data-i18n="nav_attractions">Spots</span>
+   <span data-i18n="nav_attractions">概覽</span>
    <div class="st-label" data-i18n="stat_total">Est. Total</div>
    <button class="pill" data-i18n="cal_week1">Week 1（3/30–4/5）</button>
    ```
@@ -1300,6 +1328,60 @@ todo_checkin, todo_tickets, todo_hotel, todo_weather, todo_itinerary, todo_fligh
 
 ---
 
+### Overview Tab: Weather Data + Today Card + Weather Strip
+
+The Overview tab (tab-attractions) contains a **today card** and **14-day weather forecast strip** below the stats and info box. These are rendered by `renderOverviewExtras()` which calls `renderTodayCard()` and `renderWeatherStrip()`.
+
+#### Weather Data (in app.js)
+
+Research weather forecasts during Phase 4 (Deep Research) and hardcode as `WEATHER_DATA` array in app.js:
+```js
+const WEATHER_DATA = [
+  { date:'2026-03-30', icon:'rainy', hi:14, lo:9,
+    desc:{zh:'陣雨',en:'Showers',ko:'소나기',ja:'にわか雨'},
+    sunrise:'06:22', sunset:'18:40', city:'busan' },
+  // ... one entry per trip day
+];
+```
+- `icon`: Material Symbols icon name (`clear_day`, `partly_cloudy_day`, `rainy`, `grain`, `cloudy`)
+- `desc`: i18n weather description object
+- `sunrise`/`sunset`: local time strings (HH:MM)
+- `city`: lowercase city key matching POI city field
+
+#### City Theme Mapping (Material icons, NO emoji)
+```js
+const CITY_THEMES = {
+  'CityNameInSchedule': { icon: 'park', label: 'CityName' },
+  // icon = Material Symbols icon name for the city
+};
+```
+
+#### Today Card Rendering (`renderTodayCard`)
+- **Before trip:** Shows city icon + "Trip hasn't started yet" + Day 1 preview events
+- **During trip:** Shows city icon + Day X + city name + weather row + events timeline
+- **After trip:** Shows flight_takeoff icon + "Trip has ended" message
+- Weather row: Material weather icon + temp + desc + sunrise (`wb_twilight`) + sunset (`nightlight`)
+- Events timeline: colored dots per category + time + event name, `.past` events dimmed
+
+#### Weather Strip Rendering (`renderWeatherStrip`)
+- Horizontal scroll container with one card per day (14 cards)
+- Each card: day number (D1-D14), date, Material weather icon, temp, description, sunrise/sunset, golden hour time
+- Today's card highlighted with `border-color:var(--text)` + `box-shadow`
+- Auto-scroll to today on render
+
+#### Schedule City Name Mapping
+Schedule data uses Chinese city names (e.g., '釜山', '阿蘇/熊本'). Use a mapping to i18n keys:
+```js
+const SCHEDULE_CITY_I18N = { '釜山': 'scity_busan', '阿蘇/熊本': 'scity_aso', ... };
+function getScheduleCityName(city) {
+  const key = SCHEDULE_CITY_I18N[city];
+  return key ? t(key) : city;
+}
+```
+Add corresponding i18n entries (`scity_busan`, `scity_aso`, etc.) for all schedule city names.
+
+---
+
 ### Layout Blueprint
 
 This section is the **complete specification** for the HTML you generate. Follow it precisely to
@@ -1318,35 +1400,71 @@ scrollable main content area. Each tab is a `<div class="tab-panel">` toggled vi
 │   ├── spacer (flex:1)
 │   └── utility buttons (print)
 ├── <div class="bottom-bar">  ← fixed bottom, mobile only (display:none on desktop)
-│   └── <div class="bottom-bar-inner"> — flex row of .bb buttons with icon + label
+│   ├── <div class="bottom-bar-inner"> — flex row of .bb buttons (max 5)
+│   │   Order: 概覽(attractions) | 行程(calendar) | 票券(booking) | 景點(time) | More
+│   └── <div class="bb-more-menu"> — popup menu for overflow tabs (預算, 清單, 語言)
 └── <div class="main">  ← flex:1, margin-left:60px, padding:32px 40px, max-width:1300px
-    ├── <div class="tab-panel active" id="tab-attractions">  ← first tab, NO overview/globe tab
+    ├── <div class="tab-panel active" id="tab-attractions">  ← OVERVIEW tab (first tab)
     ├── <div class="tab-panel" id="tab-calendar">
     ├── <div class="tab-panel" id="tab-booking">  ← ticket price comparison tab
     ├── <div class="tab-panel" id="tab-budget">
-    ├── <div class="tab-panel" id="tab-time">  ← time-focused ONLY
+    ├── <div class="tab-panel" id="tab-time">  ← SPOTS/MAP tab (filters + map + POI list)
     └── <div class="tab-panel" id="tab-checklist">
 ```
 
-#### 5 Tabs and Their Layouts
+**Sidebar icons (top to bottom):** `travel_explore` (概覽) → `calendar_month` → `sell` → `wallet` → `map` (景點) → `checklist`
+**Bottom bar (left to right):** `travel_explore` 概覽 → `calendar_month` 行程 → `sell` 票券 → `map` 景點 → `more_horiz` More
+**More menu:** 預算 (wallet) → 清單 (checklist) → 語言 (translate)
 
-**NO globe/overview tab.** The first tab is Attractions. There is NO separate overview or landing page.
-
-**Tab 1: Attractions + Map**
+**Tab switching guard:** `showTab(id)` must check if the tab is already active and return early to prevent re-render and scroll:
+```js
+function showTab(id) {
+  var currentPanel = document.querySelector('.tab-panel.active');
+  if (currentPanel && currentPanel.id === 'tab-' + id) return;
+  // ... rest of tab switching logic
+  window.scrollTo(0, 0);
+}
 ```
-├── .hdr (flex row: .hdr-left with h1 + meta + desc, .hdr-right with action buttons)
+
+#### 6 Tabs and Their Layouts
+
+**Tab 1: Overview (id=tab-attractions)** — the landing page with trip summary + today's plan
+```
+├── .hdr (flex row: .hdr-left with h1 + meta + desc, .hdr-right with export button)
 │   NOTE: NO hero banner image. Starts directly with compact h1 + meta text.
 ├── .stats (4-col grid, inverted black bg, white text)
 │   └── .st (label → big number → subtitle) × 4
-├── .filters (row of .chip buttons — tab-style underline, not pills)
-└── .attr-layout (2-col grid: map left, POI list right)
-    ├── #map (Leaflet/OpenStreetMap, 480px height)
+├── .info-box (cherry blossom / seasonal info)
+├── .time-countdown-wrap #time-countdown (countdown timer — ticks every second)
+├── .today-card #today-card (today's itinerary summary — JS rendered)
+│   └── .today-card-inner (background:var(--surface), border, border-radius:var(--r))
+│       ├── .today-card-header (Material icon + title: "今日行程 · Day X · CityName")
+│       ├── .today-weather (weather icon + temp + desc + sunrise/sunset — all Material icons)
+│       └── .today-events-timeline (list of events with colored dots + time + name)
+│           └── .today-ev (.past=opacity:.4, .current=font-weight:600)
+└── .weather-forecast-strip #weather-strip (14-day horizontal scroll weather cards)
+    └── .weather-strip-scroll (overflow-x:auto)
+        └── .weather-day × 14 (Material weather icon + temp + desc + sunrise/sunset + golden hour)
+            .weather-day.today gets border-color:var(--text) highlight
+```
+
+**IMPORTANT: All icons must be Material Symbols Outlined (`<span class="mi material-symbols-outlined">`).
+NO emoji anywhere in the UI.** Weather icons use: `clear_day`, `partly_cloudy_day`, `rainy`, `grain`, `cloudy`.
+City icons use: `park`, `landscape`, `temple_buddhist`, `beach_access`, `ramen_dining`, `directions_boat`.
+Sunrise: `wb_twilight`. Sunset: `nightlight`. Golden hour: `photo_camera`.
+
+**Today card style must match chart-panel:** white background (`var(--surface)`), `border:1px solid var(--border)`, `border-radius:var(--r)`. NO gradient backgrounds, NO colored themes per city.
+
+**Tab 2: Spots / Map (id=tab-time)** — full-height map + POI list, no header
+```
+├── .filters (row of .chip buttons, margin-top:0 — flush to top)
+└── .attr-layout (2-col grid: map left, POI list right, height:calc(100vh - 120px))
+    ├── #map (Leaflet/OpenStreetMap, flex:1, min-height:0)
     │   Use: L.map() + L.tileLayer('https://{s}.tile.openstreetmap.org/...')
     │   Colored L.circleMarker per category, L.layerGroup for easy filter clearing
-    │   "Export to Google Maps" button overlay → opens Google Maps directions URL with visible POIs
-    └── .poi-list (scrollable, max-height matches map)
-        └── .poi (row: dot + info + Google Maps link + checkbox, hover inverts to black bg)
-            └── .poi-map-link (📍 icon link to Google Maps: https://www.google.com/maps/search/?api=1&query={lat},{lng})
+    │   "Export to Google Maps" button overlay
+    └── .poi-list (scrollable, max-height:100%, min-height:0)
+        └── .poi (row: dot + info + Google Maps link + checkbox)
 ```
 
 **Tab 2: Calendar / Schedule**
@@ -1392,14 +1510,37 @@ Mobile fallback (.calendar-mobile, shown <768px):
 │   └── .items-total (4px top border, right-aligned total)
 ```
 
-**Tab 4: Charts**
+**Tab 4: Booking (Tickets & Reservations)**
 ```
 ├── .hdr
-└── .charts-grid (2-col grid, border frame)
-    ├── .chart-panel.full (time allocation — CSS bar chart, spans both cols)
-    ├── .chart-panel (spending trends — bar chart + view switcher)
-    └── .chart-panel (category breakdown — horizontal bar rows)
+├── .booking-section "已預訂項目" (booked items)
+│   └── .booked-grid (mobile-first: 1-col stack; ≥769px: 2-col grid)
+│       ├── .booked-card.booked-card-wide.flight-card (full-width flight card)
+│       │   ├── .booked-card-head (name + badge)
+│       │   ├── .flight-segments (outbound + return with route visualization)
+│       │   └── .booked-card-cost + verdict + check-in link
+│       ├── .booked-card (hotel, ferry, tour — each card is self-contained)
+│       │   ├── .booked-card-head (icon + name + status badge)
+│       │   ├── .booked-card-meta (dates, details)
+│       │   ├── .booked-card-cost (price)
+│       │   └── .booked-card-links (Google Maps links)
+│       └── ... more booked cards
+├── .booking-section "票券比價" (price comparison)
+│   └── .booking-table-wrap
+│       └── .booking-table (radio buttons per platform, ★ cheapest)
+└── .booking-section "建議購買" (recommended purchases)
 ```
+
+**Booking card RWD rules:**
+- `.booked-grid` default: `grid-template-columns:1fr` (single column, mobile-first)
+- `@media(min-width:769px)`: `grid-template-columns:1fr 1fr` (2 columns)
+- `.booked-card-wide` (flight card): `grid-column:1/-1` (full width on desktop)
+- `.booked-badge`: `flex-shrink:0; white-space:nowrap` (never truncate status badges)
+- `.booked-card`: `border-radius:var(--r)` (match site-wide radius)
+- Flight route visualization must not overflow on mobile — use `flex-wrap:wrap`
+
+**NOTE: There is NO standalone Charts tab.** Time allocation charts have been removed.
+Budget charts live inside the Budget tab. The overview tab contains today's itinerary and weather.
 
 **Tab 5: Checklist**
 ```
@@ -1524,17 +1665,64 @@ These are the **exact CSS patterns** to use. Copy them into the generated `<styl
 .sb.active { background: var(--accent-bg); color: var(--accent); }
 
 /* === BOTTOM BAR (mobile) === */
+/*
+ * Tab Bar Design Rules (Mobile Bottom Navigation):
+ * - Maximum 5 items (3-5 optimal). If more tabs exist, use a "More" button as the 5th item.
+ * - Each tab has equal flex width (flex:1) — never cluster in center.
+ * - Fixed at bottom, never scrolls with content.
+ * - Safe area: padding-bottom uses env(safe-area-inset-bottom) for notch/home-indicator devices (~16px, not 34px).
+ * - viewport meta must include viewport-fit=cover for safe area to work.
+ * - Main content needs padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) to avoid overlap.
+ * - Tap-to-top: tapping the active tab scrolls back to top.
+ * - More menu: absolute-positioned popup above the tab bar, closes on any outside click.
+ * - All floating menus (More menu, lang menu) must close on document click (single handler).
+ * - Touch target: minimum 44×44pt per tab item.
+ *
+ * | Spec                  | Value                                           |
+ * |-----------------------|-------------------------------------------------|
+ * | Tab Count             | 3-5 items max (use "More" for overflow)         |
+ * | Icon Size             | 24×24px (Material Symbols at font-size:24px)    |
+ * | Icon Style            | Consistent (all outlined, active = filled)      |
+ * | Label Font Size       | 0.7rem (~11px / 10-11pt), Medium or Semibold    |
+ * | Icon-Label Gap        | 3px (avoid visual separation)                   |
+ * | Labels                | Short text below icon, i18n via data-i18n       |
+ * | Active State          | Brand accent color + font-weight:600 + FILL:1   |
+ * | Bottom Padding        | 4px base + env(safe-area-inset-bottom, ~16px) on iOS |
+ * | Bar Height            | ~49pt content + safe area padding               |
+ */
 .bottom-bar {
   display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-  background: var(--surface); border-top: 1px solid var(--border);
-  padding: 4px 0 env(safe-area-inset-bottom, 4px);
+  background: var(--surface); backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  padding: 4px 0 calc(env(safe-area-inset-bottom, 0px) + 4px);
+  /* 4px base + env() adds ~16px on iOS notch devices for home indicator */
 }
+.bottom-bar-inner { display: flex; justify-content: space-around; max-width: 440px; margin: 0 auto; }
 .bb {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
   padding: 6px 8px; background: none; border: none; cursor: pointer;
-  color: var(--text-3); font-size: 0.65rem;
+  color: var(--text-3); font-size: 0.7rem; flex: 1;
 }
-.bb.active { color: var(--accent); }
+.bb .mi, .bb .material-symbols-outlined { font-size: 24px; opacity: .5; font-variation-settings: 'FILL' 0; }
+.bb.active .mi, .bb.active .material-symbols-outlined { opacity: 1; font-variation-settings: 'FILL' 1; }
+.bb.active { color: var(--accent); font-weight: 600; }
+#bb-more-btn.has-active { color: var(--accent); font-weight: 600; }
+
+/* More menu (overflow tabs) */
+.bb-more-menu {
+  display: none; position: absolute; bottom: 100%; right: 8px;
+  background: var(--surface); backdrop-filter: blur(16px);
+  border-radius: 12px; box-shadow: 0 -4px 24px rgba(0,0,0,.12);
+  padding: 6px; min-width: 140px; margin-bottom: 4px;
+}
+.bb-more-menu.open { display: flex; flex-direction: column; gap: 2px; }
+.bb-more-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; background: none; border: none; cursor: pointer;
+  color: var(--text-2); font-size: 0.8rem; border-radius: 8px;
+}
+.bb-more-item:active { background: rgba(0,0,0,.05); }
+.bb-more-item.active { color: var(--accent); font-weight: 600; }
 
 /* === MAIN CONTENT === */
 .main {
@@ -1670,7 +1858,7 @@ These are the **exact CSS patterns** to use. Copy them into the generated `<styl
 **Zero tolerance for untranslated text.** If switching to any language shows Chinese/mixed text, it's a bug.
 
 **applyLang() must re-render ALL dynamic content:**
-- `renderPOIs()`, `renderCalendar()`, `renderBudget()`, `renderChecklist()`, `renderEntryForms()`, `renderTimeAllocation()`, `renderNomadSpots()`, `renderToday()`, `updateClocks()`
+- `renderPOIs()`, `renderCalendar()`, `renderBudget()`, `renderChecklist()`, `renderEntryForms()`, `renderNomadSpots()`, `renderToday()`, `updateClocks()`, `renderOverviewExtras()` (today card + weather strip)
 
 ##### Responsive Breakpoints
 
@@ -1678,7 +1866,7 @@ These are the **exact CSS patterns** to use. Copy them into the generated `<styl
 @media (max-width: 640px) {
   .sidebar { display: none !important; }
   .bottom-bar { display: block !important; }
-  .main { margin-left: 0; padding: 16px 12px 80px; }
+  .main { margin-left: 0; padding: 16px 12px calc(88px + env(safe-area-inset-bottom, 0px)); }
   .hdr-left h1 { font-size: 1.4rem; }
   .stats { grid-template-columns: 1fr 1fr; gap: 10px; }
   .attr-layout { grid-template-columns: 1fr; }
@@ -1720,6 +1908,24 @@ These are the **exact CSS patterns** to use. Copy them into the generated `<styl
 20. **Time allocation is computed from schedule** — do NOT hardcode time data. Calculate total hours per category and city days from the actual `schedule` array in trip.json. Render dynamically via JS.
 21. **Language switcher in sidebar** — add a language toggle button at the bottom of the sidebar (above print). It cycles between: the user's passport language (e.g., Traditional Chinese for Taiwan passport) and the destination's local language(s) (e.g., Korean for Korea, Japanese for Japan). All text content that has a translation should have `data-lang-zh`, `data-lang-ko`, `data-lang-ja` attributes. The switcher changes which `data-lang-*` attribute is displayed. POI names already have `nameLocal` — use that. UI labels, section titles, and tab names should also have translations stored in a `translations` object in trip.json.
 22. **Booked flight cards** — outbound and return flights are shown in ONE card with a vertical divider. Each flight shows: flight number, date+time, airline, departure→arrival terminal numbers, 📍 Google Maps links for each terminal, AND a **Web Check-in link** with the airline's online check-in URL + when it opens (e.g., "Opens 48hr – 1hr before departure"). Research the specific airline's check-in window.
+
+    **CRITICAL: Timezone-aware flight duration calculation.** Flight duration MUST account for timezone differences between departure and arrival airports. Do NOT simply subtract local arrival time from local departure time — this produces wrong results for international flights.
+
+    **Correct method:**
+    1. Convert both departure and arrival times to UTC first
+    2. Subtract to get actual flight duration
+    3. Example: TPE 16:40 (UTC+8) → PUS 19:55 (UTC+9)
+       - Depart: 16:40 - 8h = 08:40 UTC
+       - Arrive: 19:55 - 9h = 10:55 UTC
+       - Duration: 10:55 - 08:40 = **2h15m** (NOT 3h15m from naive subtraction)
+    4. Example: FUK 10:25 (UTC+9) → TPE 11:55 (UTC+8)
+       - Depart: 10:25 - 9h = 01:25 UTC
+       - Arrive: 11:55 - 8h = 03:55 UTC
+       - Duration: 03:55 - 01:25 = **2h30m** (NOT 1h30m from naive subtraction)
+
+    **For schedule events (trip.json):** The `sh`/`eh` values use the day's local timezone (based on the `city` field). For cross-timezone flights, `sh` is departure time in the day's timezone and `eh` is arrival time converted to the day's timezone. The `note` field should show both local times with timezone labels (e.g., "10:25 depart (JP) · 11:55 arrive (TW) · 2h30m flight").
+
+    **For the flight card in index.html:** The displayed duration (e.g., "IT606 · 2h15m") must be the UTC-corrected actual flight time, not the naive local-time difference.
 23. **Mobile POI click → scroll to map** — when a POI item is clicked on mobile (`window.innerWidth <= 900`), call `document.getElementById('map').scrollIntoView({behavior:'smooth', block:'start'})` after `focusPOI()` so the user sees the pin on the map.
 24. **Pre-trip todo items are context-aware:**
     - `todo_charger` must specify the **exact plug type** needed for the destination country (e.g., "Korea needs round-pin adapter (Type C/F)", "Japan doesn't need an adapter"). Research plug types per destination.
@@ -1741,6 +1947,17 @@ Core:
 - Quick review (star rating + text) → localStorage persistence
 - Export to Google Maps: generate a shareable Google Maps link with all POIs as waypoints
 - NO dark mode toggle, NO floating action button (FAB)
+
+Mobile Bottom Bar (Tab Bar):
+- Maximum 5 visible tabs. If there are 6+ tabs, group overflow items under a "More" button (5th slot).
+- "More" button opens a popup menu (absolute positioned above tab bar) listing overflow tabs.
+- Clicking a More-menu item switches to that tab AND closes the menu.
+- More button shows active state (accent color) when any overflow tab is active.
+- ALL floating menus (More menu, language menu) close on a single document-level click handler.
+  Do NOT use stopPropagation on menu containers — only on the toggle button itself.
+- Language toggle inside the More menu: clicking "語言" opens the lang sub-menu;
+  clicking any language option switches lang, closes lang menu, closes More menu.
+- Tapping the More button closes any open lang menu first, then toggles the More menu.
 
 Schedule / Calendar Tab:
 - Desktop: Google Calendar-style week view — days as columns, hours on Y-axis (60px/hour),
@@ -1790,7 +2007,7 @@ Booking Table (below map in Attractions tab):
 
 The generated HTML must include ALL of these content sections, distributed across the 5 tabs.
 
-**There is NO globe/overview tab and NO Guide/review tab.** Only 5 tabs total.
+**The first tab IS the Overview tab** (id=tab-attractions, icon=travel_explore) containing trip header, stats, countdown, today card, and weather strip. **The Spots/Map tab** (id=tab-time, icon=map) has filters + full-height map + POI list. **NO Guide/review tab.** 6 tabs total: Overview, Calendar, Booking, Budget, Spots, Checklist.
 
 **Attractions Tab:**
 1. Trip header (destination, dates, duration, description) — NO hero banner image
@@ -2029,8 +2246,13 @@ This way even if the user forgets the instructions, they have a reference in the
 If the user wants to modify an existing trip plan:
 1. Read the existing HTML file
 2. Parse the embedded JSON data (stored in a `<script id="trip-data">` tag)
-3. Apply changes (add/remove attractions, change dates, adjust budget)
-4. Regenerate the HTML with updated data
+3. **Check weather for affected days** — read the `WEATHER_DATA` array from app.js and provide weather-aware advice:
+   - "Day 5 is sunny ☀️ — great for moving the outdoor market here"
+   - "Day 3 has rain 🌧️ — I'd suggest keeping the museum on this day"
+   - If swapping days, compare weather for both days and recommend the better arrangement
+   - If adding a new outdoor attraction, suggest placing it on the clearest-weather day available
+4. Apply changes (add/remove attractions, change dates, adjust budget)
+5. Regenerate the HTML with updated data (including updated WEATHER_DATA if dates changed)
 
 ---
 
