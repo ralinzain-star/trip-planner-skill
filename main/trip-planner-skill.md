@@ -84,8 +84,8 @@ If the user doesn't specify, use the existing default layout blueprint already d
 
 **Respond in whatever language the user opens the conversation with.** This is non-negotiable.
 Do NOT default to English unless the user wrote in English. Examples:
-- User writes in Traditional Chinese → respond entirely in Traditional Chinese (繁體中文)
-- User writes in Simplified Chinese → respond in Simplified Chinese (简体中文)
+- User writes in Traditional Chinese → respond entirely in Traditional Chinese
+- User writes in Simplified Chinese → respond in Simplified Chinese
 - User writes in Japanese → respond in Japanese
 - User writes in Korean → respond in Korean
 - Mixed language → mirror the dominant language
@@ -100,11 +100,11 @@ before asking. Do NOT assume blindly — infer first, then confirm with the pass
 
 | Language | Inferred nationality | Default currency | Holiday calendar |
 |----------|---------------------|------------------|-----------------|
-| 繁體中文 (Traditional Chinese) | Taiwanese | TWD | Taiwan: Lunar New Year, Tomb Sweeping (清明), Dragon Boat, Mid-Autumn, 10/10 National Day |
-| 简体中文 (Simplified Chinese) | Mainland Chinese | CNY/RMB | China: Spring Festival golden week, May Day, National Day golden week (十一) |
-| 日本語 (Japanese) | Japanese | JPY | Japan: Golden Week (4/29–5/6), Obon (mid-Aug), Silver Week, Year-End/New Year |
-| 한국어 (Korean) | South Korean | KRW | Korea: Seollal, Chuseok, Children's Day (5/5), National holidays |
-| ภาษาไทย (Thai) | Thai | THB | Thai: Songkran (Apr), Royal holidays |
+| Traditional Chinese | Taiwanese | TWD | Taiwan: Lunar New Year, Qingming (Tomb Sweeping), Dragon Boat, Mid-Autumn, Oct 10 National Day |
+| Simplified Chinese | Mainland Chinese | CNY/RMB | China: Spring Festival (Golden Week), May Day, National Day (Golden Week) |
+| Japanese | Japanese | JPY | Japan: Golden Week (4/29–5/6), Obon (mid-Aug), Silver Week, Year-End/New Year |
+| Korean | South Korean | KRW | Korea: Seollal, Chuseok, Children's Day (5/5), national holidays |
+| Thai | Thai | THB | Thailand: Songkran (Apr), royal holidays |
 | English | Ambiguous — many countries | Confirm with user | Confirm with user |
 
 Use inferred nationality to: pre-set currency display, skip asking obvious questions, tailor visa advice,
@@ -151,10 +151,21 @@ Use `AskUserQuestion` to present structured questions. Group them logically.
 | 📶 SIM card | "Have you bought a data/SIM card? How much did it cost?" — if yes, record cost. If no, recommend options (eSIM, physical SIM, wifi egg) with prices. | Budget + checklist |
 | 🚗 Airport transfer | "Do you need airport pickup/drop-off?" — if yes, note direction (arrival/departure/both) and budget. If no, research public transit options to/from airport. | Day 1 & last day logistics |
 | 📋 Already-decided plans? | "Do you have any plans already decided? For example: tickets already purchased, meeting friends, restaurant reservations, signed up for a tour, theme park tickets bought, etc." — list specific examples so the user doesn't forget | These go into the plan FIRST as immovable blocks |
+| 🌏 Been to this destination before? | "Have you been to {destination} before?" — if YES: "What places did you visit last time? Do you have any previous travel plans you can share? Do you want to go to places you haven't been before? Or are there some you'd like to revisit?" | Avoid recommending places they've already been (unless they want to revisit) |
+| ✈️ Travel history | "What's your usual travel style? Which countries have you been to recently? Do you have any favorite attractions or itineraries you can share?" — ask them to share favorite past trips, attractions, or itineraries. Use this to infer preferences: someone who loved Kyoto temples probably enjoys culture/history; someone who raves about Thai street food is a foodie; someone who mentions hiking in New Zealand likes nature/adventure. The more specific examples they give, the better your recommendations. | Tailor attraction recommendations to their proven taste, not assumptions |
+| 🎒 Already own travel items? | "You might already have some travel items from previous trips: transit cards (T-money, ICOCA, Suica), Wi-Fi hotspot, power adapters?" | Avoid recommending purchases they don't need |
 
 **If the user says flights/hotel are NOT booked**, follow up:
 - Flights: "Are you looking at any particular flight times? I can help figure out the best arrangement."
-- Hotel: "What's your rough budget per night? Want to stay downtown or further out to save money?" + suggest 2–3 areas based on the destination with pros/cons
+- Hotel: Ask about accommodation preferences BEFORE suggesting options (see below)
+
+**Accommodation preferences (ask before recommending hotels):**
+- "Do you have a preference for accommodation type? Hotel, Airbnb, or are hostels okay too?" — if they're open to hostels, explain pros/cons:
+  - Pros: much cheaper (often 1/3 the price), social atmosphere, often in great locations, many modern hostels have private rooms
+  - Cons: shared bathrooms (usually), noise, less privacy, luggage security, some have curfews
+- "Do you need to do laundry during your trip?" — if YES, note that some hotels/hostels have coin laundry, or recommend nearby laundromats. This affects packing advice (pack lighter if laundry available)
+- "What's your rough budget per night?" + suggest 2–3 areas based on the destination with pros/cons
+- **If accommodation is not booked yet, plan the itinerary FIRST** — then recommend areas/hotels that fit the route. Don't force hotel booking before route planning.
 
 ### Round 1.5: Flight Price Intelligence & Optimal Date Recommendation
 
@@ -355,7 +366,7 @@ Hit ALL five platforms — each has different inventory and pricing:
   prices, ratings, and categories. Look for "Top 10", "Must-visit", "Popular" pages.
 - `site:kkday.com {destination}` — same approach. KKday often has unique local experiences
   (e.g., cooking classes, private tours, cultural workshops) that Klook doesn't.
-  Also search: `site:kkday.com "{destination} 一日遊"` or `"{destination} day tour"`.
+  Also search: `site:kkday.com "{destination} day tour"` or `"{destination} day tour"`.
 - `site:trip.com {destination} things to do` — Trip.com has strong Asia coverage and often
   has exclusive deals for Chinese-speaking travelers; check their "Things to Do" and "Attractions" pages.
 - `site:getyourguide.com {destination}` — stronger for Western-oriented destinations.
@@ -368,10 +379,10 @@ buying tickets individually. You MUST search for these — they dramatically sim
 
 - Search: `"{destination} city pass"` — e.g., "Osaka Amazing Pass", "Fukuoka City Pass",
   "Seoul City Pass", "Tokyo Metro Pass", "Visit Seoul Card"
-- Search: `"{destination} one-day tour"` or `"{destination} 一日遊 行程"`
-- Search on KKday: `"{destination} pass"`, `"{destination} 交通票券"`, `"{destination} 景點套票"`
+- Search: `"{destination} one-day tour"` or `"{destination} day trip itinerary"`
+- Search on KKday: `"{destination} pass"`, `"{destination} transportation pass"`, `"{destination} attraction bundle"`
 - Search on Klook: `"{destination} pass"`, `"{destination} attraction combo"`
-- Search on Trip.com: `"{destination} tour packages"`, `"{destination} 一日遊"`
+- Search on Trip.com: `"{destination} tour packages"`, `"{destination} day tour"`
 - Fetch the actual pass pages and extract: pass name, price, included attractions, validity period,
   purchase link, and whether it includes public transit
 
@@ -882,9 +893,21 @@ Search for each of these. Adapt search queries to the destination language when 
 1. **Visa requirements** for the user's passport (default: Taiwan/ROC passport)
 2. **Currency & exchange**
    - Current exchange rate (home currency → destination currency)
+   - **Mental math trick** for quick conversion — create a simple formula the user can remember.
+     E.g., KRW→TWD: "divide by 40" or "×0.025"; JPY→TWD: "divide by 5" or "×0.2".
+     Present it as a catchy mnemonic the user can use on the go.
    - Best places to exchange (airport? ATM? downtown?)
-   - Card payment prevalence (can you tap everywhere, or cash-heavy?)
-3. **Power adapters** — plug type, voltage
+   - Card payment prevalence (can you tap everywhere, or is it cash-heavy? What % of shops accept cards?)
+   - Include this in the HTML as a quick-reference section
+3. **Country-specific practical info** (research for EACH destination country):
+   - **Driving side**: left or right? (important for pedestrian awareness)
+   - **Credit card acceptance**: Visa/Mastercard prevalence, contactless payment (Apple Pay etc.), common local payment apps (PayPay in Japan, KakaoPay in Korea, etc.)
+   - **Price comparison with home country**: give concrete examples (convenience store meal, coffee, transit fare)
+   - **Public transit etiquette**: can you eat/drink on trains/buses? Phone calls allowed? Priority seats rules?
+   - **Tipping culture**: is tipping expected? How much?
+   - **Tap water**: drinkable or not?
+   - Include all of this in the checklist tab as a "Country Quick Facts" section
+4. **Power adapters** — plug type, voltage. Also **recommend bringing a power strip/extension cord** — most hotel rooms only have 1-2 outlets near the bed
 4. **Must-download apps** — transit apps, payment apps, maps, translation, ride-hailing
 5. **Selected attractions — detailed info**: for EACH attraction the user picked:
    - Exact address, opening hours, closed days
@@ -896,7 +919,13 @@ Search for each of these. Adapt search queries to the destination language when 
 7. **Accommodation areas** — only if hotel NOT already booked. Which neighborhoods are best
    for the user's style, with pros/cons and price ranges
 8. **Transportation details**
-   - Airport → city center: specific routes based on user's flight times
+   - **Airport ↔ city/hotel transport** — research ALL options (train, bus, taxi, shuttle) with:
+     - Route, duration, cost, first/last departure times
+     - How to find the stop/station at the airport (which floor, which exit)
+     - Payment methods (cash only? IC card? where to buy tickets?)
+     - Step-by-step guide for the recommended option
+     - **Tutorial article link** — search for a how-to guide written in the user's conversation language (e.g., search "Incheon Airport to Seoul transportation guide" for an English-speaking user going to Korea). If no guide exists in the user's language, find one in English.
+     - Include BOTH directions: airport→hotel AND hotel→airport (return trip may have different options)
    - City transit passes: calculate whether a pass is worth it based on the planned routes
    - Inter-city transport if multi-city trip
 9. **Tickets & passes — THIS IS A CRITICAL SECTION, not an afterthought**
@@ -949,6 +978,15 @@ Search for each of these. Adapt search queries to the destination language when 
 - **Booking links must be real product URLs** — search `site:klook.com {name}` and
   `site:kkday.com {name}` to find the actual product page, not just the homepage
 - For every paid attraction, compare at least 3 sources (official + 2 platforms)
+
+### Tutorial & Guide Language Rules
+
+When providing tutorial links, how-to guides, or step-by-step instructions (e.g., how to buy a transit card, how to get from airport to city, how to use a payment app):
+- **Search for guides in the user's conversation language FIRST** (e.g., if chatting in English, search "Incheon Airport to Busan transportation guide")
+- If no quality guide exists in the user's language, search in **English** as fallback
+- **Never link to guides in the destination's local language** unless the user speaks it — a Japanese tutorial is useless for an English-speaking tourist
+- For purchase/application tutorials (eSIM setup, transit card purchase, visa application, city pass activation), always find a step-by-step guide with screenshots if possible
+- Include these tutorial links in the HTML checklist tab and booking tab where relevant
 - Always recommend the cheapest option and explain why (e.g., "Klook is ★ KRW 10,500 vs
   official KRW 12,000 — save 12%")
 - If a city pass exists, calculate whether it's worth buying based on the user's itinerary
@@ -1070,19 +1108,19 @@ Post-optimization avg daily travel distance: Y km (save Z%)
 
 ## Phase 5: Generate the HTML
 
-Generate a complete trip planner app as **分離的檔案結構**（`index.html` + `style.css` + `app.js` + `data/trip.json`）。
+Generate a complete trip planner app as a **multi-file folder structure** (`index.html` + `style.css` + `app.js` + `data/trip.json`).
 Do NOT use any template file — build all files from scratch using the layout blueprint below and populate with the researched data.
 
 ### Data Language Rule
 
-**`trip.json` 的文字欄位必須包含：使用者對話語言 + 目的地國家語言 + 英文。**
+**All text fields in `trip.json` must include: the user's conversation language + the destination country language + English.**
 
-- `name` 欄位使用使用者的對話語言（例如繁體中文使用者 → `name` 為中文）
-- 額外提供目的地國家語言欄位（例如去韓國 → `name_ko`，去日本 → `name_ja`）
-- 英文欄位永遠包含（`name_en`）
-- 同樣規則適用於所有文字欄位：`desc`、`note`、`tip`、`title` 等
+- Use the user's conversation language in the base field (e.g., for `name`, store the user's language in `name`)
+- Also provide destination-language fields (e.g., Korea → `name_ko`, Japan → `name_ja`)
+- Always include English fields (e.g., `name_en`)
+- Apply the same rule to all user-visible text fields: `desc`, `note`, `tip`, `title`, etc.
 
-**範例：台灣使用者去韓國+日本**
+**Example: Taiwanese user visiting Korea + Japan**
 ```json
 {
   "name": "龍頭山公園+釜山塔",
@@ -1093,9 +1131,9 @@ Do NOT use any template file — build all files from scratch using the layout b
 }
 ```
 
-**`nameLocal`** 保留為該景點所在國家的當地語言名稱（用於地圖標記、Google Maps 搜尋等）。
+**`nameLocal`** should be the attraction's local-language name as used in that country (for map labels, Google Maps search, etc.).
 
-**Schedule events 同理：**
+**Apply the same rule to schedule events:**
 ```json
 {
   "name": "抵達金海機場",
@@ -1109,7 +1147,7 @@ Do NOT use any template file — build all files from scratch using the layout b
 }
 ```
 
-**Checklist items、budget items、tagline 等所有使用者可見文字皆遵循此規則。**
+**All other user-visible text (checklist items, budget items, taglines, etc.) must follow this rule.**
 
 ### Default Website Language
 
@@ -1276,13 +1314,16 @@ The calendar renderer shows this info:
 
 **The final HTML booking tab must include ALL of these with clickable links.**
 
-**Currency rule: the currency switcher MUST include the user's home currency (from nationality).**
-- Currency switcher pills always include: **home currency** (from passport) + destination currency + USD
+**Currency rule: the currency switcher buttons are determined by the user's nationality and the trip's destination countries.**
+- Include ONLY: **user's home currency** (from passport/nationality) + **each destination country's currency**
+- Do NOT include USD unless the user is American or a destination uses USD
 - Default display = home currency
-- Example: Taiwanese user going to Korea → pills: TWD / KRW / USD
+- Example: Taiwanese user going to Korea + Japan → pills: TWD / KRW / JPY (no USD)
 - Example: American user going to Japan → pills: USD / JPY
+- Example: Japanese user going to Korea + Taiwan → pills: JPY / KRW / TWD
+- Multi-destination trips include all destination currencies (e.g., Korea→Japan = KRW + JPY)
 - All prices throughout the HTML show **destination currency（home currency equivalent）**
-  e.g., "₩3,000（NT$64）" or "¥1,500（$10 USD）"
+  e.g., "₩3,000（NT$64）" or "¥1,500（NT$300）"
 
 ---
 
@@ -1508,8 +1549,8 @@ scrollable main content area. Each tab is a `<div class="tab-panel">` toggled vi
 │   └── utility buttons (print)
 ├── <div class="bottom-bar">  ← fixed bottom, mobile only (display:none on desktop)
 │   ├── <div class="bottom-bar-inner"> — flex row of .bb buttons (max 5)
-│   │   Order: 概覽(attractions) | 行程(calendar) | 票券(booking) | 景點(time) | More
-│   └── <div class="bb-more-menu"> — popup menu for overflow tabs (預算, 清單, 語言)
+│   │   Order: Overview | Itinerary | Booking | Spots | More
+│   └── <div class="bb-more-menu"> — popup menu for overflow tabs (Budget, Checklist, Language)
 └── <div class="main">  ← flex:1, margin-left:60px, padding:32px 40px, max-width:1300px
     ├── <div class="tab-panel active" id="tab-attractions">  ← OVERVIEW tab (first tab)
     ├── <div class="tab-panel" id="tab-calendar">
@@ -1519,9 +1560,9 @@ scrollable main content area. Each tab is a `<div class="tab-panel">` toggled vi
     └── <div class="tab-panel" id="tab-checklist">
 ```
 
-**Sidebar icons (top to bottom):** `travel_explore` (概覽) → `calendar_month` → `sell` → `wallet` → `map` (景點) → `checklist`
-**Bottom bar (left to right):** `travel_explore` 概覽 → `calendar_month` 行程 → `sell` 票券 → `map` 景點 → `more_horiz` More
-**More menu:** 預算 (wallet) → 清單 (checklist) → 語言 (translate)
+**Sidebar icons (top to bottom):** `travel_explore` (Overview) → `calendar_month` → `sell` → `wallet` → `map` (Spots) → `checklist`
+**Bottom bar (left to right):** `travel_explore` (Overview) → `calendar_month` (Itinerary) → `sell` (Booking) → `map` (Spots) → `more_horiz` (More)
+**More menu:** Budget (`wallet`) → Checklist (`checklist`) → Language (`translate`)
 
 **Tab switching guard:** `showTab(id)` must check if the tab is already active and return early to prevent re-render and scroll:
 ```js
@@ -1545,7 +1586,7 @@ function showTab(id) {
 ├── .time-countdown-wrap #time-countdown (countdown timer — ticks every second)
 ├── .today-card #today-card (today's itinerary summary — JS rendered)
 │   └── .today-card-inner (background:var(--surface), border, border-radius:var(--r))
-│       ├── .today-card-header (Material icon + title: "今日行程 · Day X · CityName")
+│       ├── .today-card-header (Material icon + title: "Today's Plan · Day X · CityName")
 │       ├── .today-weather (weather icon + temp + desc + sunrise/sunset — all Material icons)
 │       └── .today-events-timeline (list of events with colored dots + time + name)
 │           └── .today-ev (.past=opacity:.4, .current=font-weight:600)
@@ -1596,63 +1637,69 @@ Mobile fallback (.calendar-mobile, shown <768px):
         └── .cal-m-event (3px black bar left + title + time)
 ```
 
-**Tab 3: Budget**
+**Tab 3: Expenses**
+
+The Expenses tab has two modes switchable via a toggle: **Estimated** (pre-trip budget) and **Actual** (real spending during the trip). Both modes share the same layout structure.
+
+```
+├── .hdr (title: "Expenses" / localized equivalent)
+├── .budget-mode-switcher (pill toggle: [Estimated] [Actual])
+├── .budget-top (single column — total panel only, no city bar chart)
+│   └── .budget-total-panel (inverted black, large amount + currency switcher)
+│       Label changes: "Estimated Total" vs "Actual Total" based on mode
+├── .chart-panel "City Cost Ratio" (horizontal bar chart)
+│   └── .h-bars → .h-bar-row per city
+│       Estimated mode: from budget items' city field
+│       Actual mode: from purchased items + daily expense items (both have city field)
+├── .chart-panel "Cost by Category" (horizontal bar chart)
+│   └── .h-bars → .h-bar-row per category (colored per cat)
+│       Categories: hotel, food, transport, attraction, shopping, other
+│       NOTE: Use horizontal bars only, NOT cat-card icon boxes.
+├── #items-list-wrap (detail list — format differs by mode)
+│   Estimated mode:
+│   └── .items-table-wrap (flat list with item + city + cost columns)
+│   Actual mode:
+│   ├── .items-table-wrap "Pre-purchased" (budget items with purchased:true)
+│   │   └── .item-row per purchased item (icon + name + cost)
+│   └── .items-table-wrap per date (daily expense groups)
+│       ├── header: date + day total
+│       └── .item-row per expense (icon + name + cost)
+```
+
+**Data structure for actual expenses** (`trip.json`):
+```json
+"budget": {
+  "items": [
+    {"name":"...", "city":"busan", "cat":"transport", "cost_twd":19600, "purchased":true},
+    {"name":"...", "city":"busan", "cat":"hotel", "cost_twd":2822}
+  ],
+  "actual_expenses": [
+    {"date":"2026-03-30", "items":[
+      {"name":"Dinner", "cat":"food", "cost_twd":348, "city":"busan"}
+    ]},
+    {"date":"2026-03-31", "items":[
+      {"name":"Fukuoka hotel", "cat":"hotel", "cost_twd":11120, "city":"fukuoka"},
+      {"name":"ARTE ticket", "cat":"attraction", "cost_twd":423, "city":"busan"}
+    ]}
+  ]
+}
+```
+
+Key rules:
+- Budget items with `"purchased":true` appear in the "Pre-purchased" group in actual mode
+- Each actual expense item should have a `city` field for accurate city ratio calculation
+- The mode toggle uses pill-style buttons (`.budget-mode-btn`) similar to currency switcher
+- No checkboxes on budget items — items are displayed as plain rows
+- The nav label for this tab is "Expenses" (not "Budget")
+
+**Tab 4: Charts**
 ```
 ├── .hdr
-├── .budget-top (2-col grid, border frame)
-│   ├── .budget-chart (left: view switcher + CSS bar chart)
-│   └── .budget-total (right: inverted black, large serif amount + currency switcher)
-├── .chart-panel "City Spending Ratio" (horizontal bar chart, border frame)
-│   └── .h-bars
-│       └── .h-bar-row (label + track with fill + value) per city
-├── .chart-panel "Spending Categories" (horizontal bar chart, border frame)
-│   └── .h-bars
-│       └── .h-bar-row (label + track with fill + value) per category
-│       Categories: Accommodation, Dining, Transport, Tickets, Shopping, etc.
-│       NOTE: Do NOT use cat-card icon boxes. Use horizontal bars only.
-├── .items-table (border frame)
-│   ├── header row (mono uppercase)
-│   ├── .item-row (checkbox + dot + name + day + cost) per item
-│   │   unchecked: opacity 0.25, name strikethrough
-│   └── .items-total (4px top border, right-aligned total)
+└── .charts-grid (2-col grid, border frame)
+    ├── .chart-panel.full (time allocation — CSS bar chart, spans both cols)
+    ├── .chart-panel (spending trends — bar chart + view switcher)
+    └── .chart-panel (category breakdown — horizontal bar rows)
 ```
-
-**Tab 4: Booking (Tickets & Reservations) — STATIC HTML（非動態渲染）**
-
-**IMPORTANT:** Booking tab 的內容直接寫在 `index.html` 中，**不是**從 `trip.json` 動態渲染。
-原因：航班卡片的航線視覺化、比價表格、建議購買等格式高度客製化，靜態 HTML 可精確控制排版。
-只有 flight verdict badge（`renderFlightIntel()`）和幣值切換（`data-cost` attribute）由 JS 動態更新。
-
-```
-├── .hdr
-├── .booking-section "已預訂項目" (booked items)
-│   └── .booked-grid (mobile-first: 1-col stack; ≥769px: 2-col grid)
-│       ├── .booked-card.booked-card-wide.flight-card (full-width flight card)
-│       │   ├── .booked-card-head (name + badge)
-│       │   ├── .flight-segments (outbound + return with route visualization)
-│       │   └── .booked-card-cost + verdict + check-in link
-│       ├── .booked-card (hotel, ferry, tour — each card is self-contained)
-│       │   ├── .booked-card-head (icon + name + status badge)
-│       │   ├── .booked-card-meta (dates, details)
-│       │   ├── .booked-card-cost (price)
-│       │   └── .booked-card-links (Google Maps links)
-│       └── ... more booked cards
-├── .booking-section "票券比價" (price comparison)
-│   └── .booking-table-wrap
-│       └── .booking-table (radio buttons per platform, ★ cheapest)
-└── .booking-section "建議購買" (recommended purchases)
-```
-
-**Booking card RWD rules:**
-- `.booked-grid` default: `grid-template-columns:1fr` (single column, mobile-first)
-- `@media(min-width:769px)`: `grid-template-columns:1fr 1fr` (2 columns)
-- `.booked-card-wide` (flight card): `grid-column:1/-1` (full width on desktop)
-- `.booked-badge`: `flex-shrink:0; white-space:nowrap` (never truncate status badges)
-- `.booked-card`: `border-radius:var(--r)` (match site-wide radius)
-- Flight route visualization must not overflow on mobile — use `flex-wrap:wrap`
-
-**NOTE: There is NO standalone Charts tab.** Time allocation charts have been removed.
-Budget charts live inside the Budget tab. The overview tab contains today's itinerary and weather.
 
 **Tab 5: Checklist**
 ```
@@ -2008,8 +2055,8 @@ These are the **exact CSS patterns** to use. Copy them into the generated `<styl
 13. **Chart bars must have visible color** — `--chart-bar` should be `#888` or darker, NOT light gray like `#D4D4D8`. Time allocation bars should use category colors (attraction=coral, work=indigo, food=green, etc.)
 14. **Mobile padding is mandatory** — all content sections (charts, h-bars, cat-grid, items-table, section-labels) must have `padding: 0 16px` on mobile. Header and calendar also need top padding.
 15. **Category breakdown uses horizontal bars** — use `.h-bars` + `.h-bar-row` style (like city breakdown), NOT `.cat-card` icon boxes. This saves vertical space.
-16. **Budget item checkbox = done indicator** — checked items get `opacity:0.25; text-decoration:line-through`. The stats total shows full budget. The items-table bottom total shows the sum of CHECKED items (checked items total). Charts always show all items.
-17. **Cover page is MANDATORY** — always included。預設使用深色漸層背景（`#1a1a2e`），使用者可透過右上角相機按鈕上傳自己的照片（存入 localStorage 持久化）。若 AI 無法生成封面圖，就使用純色/漸層背景讓使用者自行上傳。Cover page 是進入 app 的第一個畫面（Today overlay 之後），點擊 GO 或上滑進入主介面。
+16. **Expenses tab has no checkboxes** — budget items are plain rows (name + city + cost). The tab has an Estimated/Actual toggle. In actual mode, items with `purchased:true` appear in a "Pre-purchased" group, followed by daily expense groups. Each actual expense item has a `city` field for city ratio calculation.
+17. **Cover page is MANDATORY** — always included. Default to a dark gradient background (`#1a1a2e`). The user can upload their own photo via a top-right camera button (persist in `localStorage`). If the AI cannot generate a cover image, fall back to a solid/gradient background and let the user upload manually. The cover page is the first screen of the app (after the Today overlay). Tap GO or swipe up to enter the main UI.
 18. **Live clocks on Calendar tab** — show real-time clocks in the calendar header: destination local time (primary, inverted black) + passport country time (secondary). Update every 30 seconds. Use `toLocaleTimeString` with `timeZone` option.
 19. **Now line on Calendar** — a red horizontal line (`#e8664a`) with a dot and time label showing the current **destination timezone** (e.g., "02:43 GMT+9" or "02:43 KST"). Use `toLocaleString('en-US', {timeZone: DEST_TZ, timeZoneName:'short'})` to get the timezone abbreviation. Updates every 30 seconds.
 20. **Time allocation is computed from schedule** — do NOT hardcode time data. Calculate total hours per category and city days from the actual `schedule` array in trip.json. Render dynamically via JS.
@@ -2047,7 +2094,7 @@ All of these MUST work in the generated HTML:
 
 ```
 Core:
-- Checkbox toggle on attractions → live budget recalc across all tabs
+- Estimated/Actual expense toggle → switches all charts, totals, and detail lists
 - Currency switcher pills → update displayed amounts (home / dest / USD / EUR)
 - Filter chips → show/hide POIs by category or city
 - Print-friendly mode (hides interactive elements, clean layout)
@@ -2062,7 +2109,7 @@ Mobile Bottom Bar (Tab Bar):
 - More button shows active state (accent color) when any overflow tab is active.
 - ALL floating menus (More menu, language menu) close on a single document-level click handler.
   Do NOT use stopPropagation on menu containers — only on the toggle button itself.
-- Language toggle inside the More menu: clicking "語言" opens the lang sub-menu;
+- Language toggle inside the More menu: clicking "Language" opens the language sub-menu;
   clicking any language option switches lang, closes lang menu, closes More menu.
 - Tapping the More button closes any open lang menu first, then toggles the More menu.
 
@@ -2075,14 +2122,16 @@ Schedule / Calendar Tab:
 - "All day" events shown in header row, not time grid
 - Work blocks shown in distinct style (if nomad mode)
 
-Budget Tab:
-- Top section: 2-panel grid
-  - Left: period bar chart (switchable "by week" / "by city" via pill buttons)
-  - Right: large total with currency switcher (inverted black section)
-- Category cards: auto-fit grid, sorted by highest spend, with progress bars
-- Detail list: rows with checkbox + dot + name + day + price
-  - Unchecked rows: opacity 0.25, strikethrough
-- All changes immediately update totals, averages, and charts
+Expenses Tab:
+- Mode toggle: [Estimated] [Actual] pill buttons at top
+- Total panel: large amount with currency switcher (inverted black section)
+  - Label changes per mode: "Estimated Total" / "Actual Total"
+- City cost ratio: horizontal bars (always visible in both modes)
+- Category breakdown: horizontal bars sorted by highest spend, colored per category
+- Detail list:
+  - Estimated mode: flat rows (item + city + cost), no checkboxes
+  - Actual mode: "Pre-purchased" group (budget items with purchased:true) + per-date groups with day totals
+- All changes immediately update totals and charts when switching modes or currency
 
 POI / Attractions Tab:
 - Click POI → opens a **detail modal popup** with:
@@ -2179,11 +2228,13 @@ The generated HTML must include ALL of these content sections, distributed acros
     - Transit passes (T-money, Nishitetsu pass, etc.)
     - Advance-booking-required attractions
 
-**Budget Tab:**
-9. Period spending chart (by week / by city toggle)
-10. Total spend with currency converter
-11. Category breakdown cards with progress bars
-12. Detailed item list with checkboxes and live totals
+**Expenses Tab:**
+9. Estimated/Actual mode toggle (pill buttons)
+10. Total spend with currency converter (label changes per mode: "Estimated Total" / "Actual Total")
+11. City cost ratio horizontal bars (both modes — estimated uses budget items' city, actual uses purchased + daily expense city fields)
+12. Category breakdown horizontal bars (colored per category)
+13. Detail list: estimated mode = flat table (item + city + cost); actual mode = "Pre-purchased" group (budget items with `purchased:true`) + per-date groups with day totals
+14. No checkboxes — all items displayed as plain rows
 
 **Time Allocation Tab (renamed from Charts — time-focused ONLY, no spending data):**
 13. Time allocation segmented bar (Attractions X days / Work X days / Transport X days / Shopping X days / Food every day)
@@ -2208,7 +2259,7 @@ Every tab must contain REAL, complete data from the research phases:
 - **Attractions tab**: ALL POIs with real names, addresses, prices, hours, Google Maps links
 - **Calendar tab**: ALL 14 days with every event, transit, meal, and work block filled in
 - **Booking tab**: ALL purchased items with links, ALL price comparisons with real URLs
-- **Budget tab**: ALL cost items with real prices, working currency switcher, live checkbox recalc
+- **Expenses tab**: ALL cost items with real prices, working currency switcher, estimated/actual toggle, `purchased` flags on pre-bought items, `city` field on actual expense items
 - **Time Allocation tab**: Real time allocation data calculated from the actual itinerary
 - **Checklist tab**: ALL checklist items (visa, packing, apps, power, SIM, etc.) + ALL coworking spaces with real addresses and hours
 
@@ -2218,7 +2269,7 @@ If a tab doesn't have enough data to be useful, it should not exist. But if it e
 
 ### trip.json Complete Schema (MANDATORY)
 
-`data/trip.json` 是整個 app 的資料核心。以下為完整頂層結構，每個欄位皆為必填（除非標註 optional）：
+`data/trip.json` is the data backbone of the entire app. Below is the full top-level structure; every field is required unless explicitly marked optional:
 
 ```json
 {
@@ -2245,9 +2296,9 @@ If a tab doesn't have enough data to be useful, it should not exist. But if it e
 }
 ```
 
-#### `entryRequirements[]` — 入境表單預填資料
+#### `entryRequirements[]` — Entry Form Prefill Tasks
 
-每個到訪國家一個 entry，包含需要線上填寫的入境表單：
+One entry per visited country, containing any online entry forms the user must complete:
 
 ```json
 "entryRequirements": [
@@ -2278,12 +2329,12 @@ If a tab doesn't have enough data to be useful, it should not exist. But if it e
 ]
 ```
 
-- `status`: `"pending"` | `"done"` — 使用者可在 Today overlay 和 Checklist tab 勾選
-- 只包含**需要線上填表的項目**（e-Arrival Card、Visit Japan Web、ESTA 等），一般提醒放 checklist
+- `status`: `"pending"` | `"done"` — user can check items in the Today overlay and Checklist tab
+- Only include **items that require an online form** (e.g., e-Arrival Card, Visit Japan Web, ESTA). Put generic reminders in the checklist.
 
-#### `flightIntel` — 機票歷史價格分析
+#### `flightIntel` — Flight Price History Analysis
 
-用於 Booking tab 的機票價格評估和 Today overlay 的航班資訊：
+Used for flight price evaluation in the Booking tab and flight info in the Today overlay:
 
 ```json
 "flightIntel": {
@@ -2299,15 +2350,15 @@ If a tab doesn't have enough data to be useful, it should not exist. But if it e
 }
 ```
 
-- `userPrice`: 使用者實際購買價格（TWD）
-- `booked`: 是否已購買
-- `monthlyPrices`: 12 個月的歷史均價，用於繪製價格走勢圖
-- `range`: 12 個月的最低/最高/平均，用於計算 verdict（🟢低於均價/🟡接近/🔴高於）
-- `renderFlightIntel()` 在 Booking tab 的航班卡片上顯示 inline verdict badge
+- `userPrice`: the price the user actually paid (in home currency, e.g., TWD)
+- `booked`: whether the flight is already purchased
+- `monthlyPrices`: 12 months of historical averages for the price trend chart
+- `range`: 12-month low/high/avg used to compute the verdict (🟢 below avg / 🟡 near avg / 🔴 above avg)
+- `renderFlightIntel()` renders the inline verdict badge on the Booking tab flight card
 
-#### `holidays` — 假期資料
+#### `holidays` — Holiday Data
 
-使用者所屬國家的假期，用於 Booking tab 的假期日曆和請假攻略：
+Holidays for the user's home country, used for the Booking tab holiday calendar and PTO-bridging tips:
 
 ```json
 "holidays": {
@@ -2327,10 +2378,10 @@ If a tab doesn't have enough data to be useful, it should not exist. But if it e
 }
 ```
 
-- `active: true` 標記與此次旅程重疊的假期
-- `tip` 欄位提供請假攻略（「請 X 天放 Y 天」）
+- `active: true` marks holidays overlapping the trip dates
+- `tip` provides PTO-bridging guidance (e.g., "Take X days off to get Y days total")
 
-#### `pois[]` — 景點資料
+#### `pois[]` — POI (Attractions) Data
 
 ```json
 {
@@ -2350,12 +2401,12 @@ If a tab doesn't have enough data to be useful, it should not exist. But if it e
 }
 ```
 
-- `city`: 小寫英文 key（`busan`, `aso`, `fukuoka`）— 用於 filter 和 map marker 分組
+- `city`: lowercase city key (`busan`, `aso`, `fukuoka`) — used for filters and map marker grouping
 - `cat`: `attraction` | `food` | `cafe` | `shopping` | `transport` | `work` | `hotel` | `other`
-- `price_krw`/`price_jpy`: 當地貨幣原價；`price_twd`: 換算後的家鄉貨幣價格
-- `nameLocal`: 景點所在國家的當地語言名稱（用於 Google Maps 搜尋）
+- `price_krw`/`price_jpy`: local currency price; `price_twd`: converted home-currency price
+- `nameLocal`: local-language name used in the destination country (for Google Maps search)
 
-#### `schedule[]` — 每日行程
+#### `schedule[]` — Daily Itinerary
 
 ```json
 {
@@ -2383,12 +2434,12 @@ If a tab doesn't have enough data to be useful, it should not exist. But if it e
 }
 ```
 
-- `sh`/`eh`: 開始/結束時間（小數，例如 10.5 = 10:30）— 使用當天城市的 local timezone
-- `city`: 中文城市名（用於 schedule 顯示，透過 `SCHEDULE_CITY_I18N` mapping 翻譯）
-- `restaurant`/`map`/`reservation`: 餐飲事件必填
-- `booking_url`/`booking_note`: 需預約項目 optional
+- `sh`/`eh`: start/end time (decimal hours, e.g., 10.5 = 10:30) — use the day's city local timezone
+- `city`: city name in the user's display language for schedule rendering (translate via the `SCHEDULE_CITY_I18N` mapping)
+- `restaurant`/`map`/`reservation`: required for food events
+- `booking_url`/`booking_note`: optional for items that require reservations
 
-#### `budget.items[]` — 預算明細
+#### `budget.items[]` — Budget Line Items
 
 ```json
 {
@@ -2403,10 +2454,10 @@ If a tab doesn't have enough data to be useful, it should not exist. But if it e
 }
 ```
 
-- `cost_twd`: 以使用者家鄉貨幣計價
-- `checked`: 預設 `false`，使用者勾選後 opacity 降低 + 刪除線，合計即時更新
+- `cost_twd`: denominated in the user's home currency
+- `checked`: default `false`; when checked, reduce opacity + add a strikethrough; totals update in real time
 
-#### `checklist[]` — 行前清單（完整 i18n）
+#### `checklist[]` — Pre-trip Checklist (Full i18n)
 
 ```json
 [
@@ -2421,14 +2472,14 @@ If a tab doesn't have enough data to be useful, it should not exist. But if it e
 ]
 ```
 
-- 每個 group 有 `title`（i18n object）和 `items`（array of i18n objects）
-- 預設 groups：證件&簽證、金融&換匯、必裝 App（韓國）、必裝 App（日本）、網路&電力、行李&穿搭
+- Each group has a `title` (i18n object) and `items` (array of i18n objects)
+- Default groups: Documents & Visa, Finance & Exchange, Must-have Apps (Korea), Must-have Apps (Japan), Internet & Power, Luggage & Clothing
 
 ---
 
 ### POI Detail Modal (MANDATORY)
 
-點擊景點列表中的 POI 時，彈出一個 **detail modal popup**，顯示完整景點資訊：
+When the user clicks a POI in the list, open a **detail modal popup** showing full POI information:
 
 ```
 ├── .poi-modal-overlay (fixed, inset:0, z-index:300, bg:rgba(0,0,0,.4))
@@ -2442,25 +2493,25 @@ If a tab doesn't have enough data to be useful, it should not exist. But if it e
 │           │   ├── 💰 price (home currency + local currency)
 │           │   ├── 📋 description
 │           │   └── category badge (colored pill)
-│           └── .poi-modal-section "搜尋更多"
+│           └── .poi-modal-section "Search more"
 │               └── .poi-modal-links (horizontal scroll)
 │                   ├── Google Maps (with favicon)
 │                   ├── Google Search (with favicon)
 │                   ├── Instagram (hashtag search)
 │                   ├── YouTube (search)
-│                   └── 小紅書 (search)
+│                   └── Xiaohongshu (search)
 ```
 
-**行為：**
-- `openPOIModal(id)` — 從 `TRIP.pois` 找到 POI，渲染 modal 內容，同時呼叫 `focusPOI(id)` 平移地圖到該位置
-- 關閉方式：點擊 × 按鈕、點擊 overlay 背景、按 Escape 鍵
-- Mobile: 點擊 POI 後自動 scroll 到地圖（`scrollIntoView`）
+**Behavior:**
+- `openPOIModal(id)` — find the POI from `TRIP.pois`, render modal content, and call `focusPOI(id)` to pan the map to that POI
+- Close via: × button, clicking the overlay background, or pressing Escape
+- Mobile: after clicking a POI, auto-scroll to the map (`scrollIntoView`)
 
 ---
 
 ### GeoJSON Export (MANDATORY)
 
-Overview tab header 的「匯出 GeoJSON」按鈕，點擊後下載所有 POIs 為 `.geojson` 檔案：
+The Overview tab header must include an "Export GeoJSON" button; clicking it downloads all POIs as a `.geojson` file:
 
 ```js
 function initExport() {
@@ -2482,27 +2533,27 @@ function initExport() {
 }
 ```
 
-可匯入 Google My Maps、QGIS、Mapbox 等工具。
+The file can be imported into Google My Maps, QGIS, Mapbox, etc.
 
 ---
 
-### Live Clocks — 雙時區即時時鐘 (MANDATORY)
+### Live Clocks — Dual-Timezone Live Clocks (MANDATORY)
 
-在 Calendar tab 的 header 右側顯示即時時鐘，每 30 秒更新：
+On the Calendar tab header (right side), show live clocks and update every 30 seconds:
 
 ```
 ├── .clock-wrap (destination timezone — primary, larger)
 │   ├── .cd-label "KR / JP"
 │   └── .cd-digits (HH : MM with HOUR/MIN sublabels)
 └── .clock-wrap (home timezone — secondary)
-    ├── .cd-label "台灣"
+    ├── .cd-label "Home"
     └── .cd-digits (HH : MM)
 ```
 
-**實作要點：**
+**Implementation notes:**
 ```js
-const DEST_TZ = 'Asia/Tokyo';   // 目的地時區
-const HOME_TZ = 'Asia/Taipei';  // 護照國家時區
+const DEST_TZ = 'Asia/Tokyo';   // destination timezone
+const HOME_TZ = 'Asia/Taipei';  // passport/home timezone
 
 function getTimeInTZ(tz) {
   return new Date().toLocaleTimeString('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit' });
@@ -2515,17 +2566,17 @@ function initClocks() {
 }
 ```
 
-- 時區根據旅程涵蓋的國家自動設定
-- i18n: `clock_dest` 和 `clock_home` label 隨語言切換
+- Timezones must be set automatically based on the countries covered by the trip
+- i18n: `clock_dest` and `clock_home` labels must switch with language
 
 ---
 
-### Now Line — 日曆當前時間線 (MANDATORY)
+### Now Line — Calendar Current-Time Indicator (MANDATORY)
 
-在 Calendar tab 的今天欄位上顯示一條紅色水平線，標示目前時間：
+On the Calendar tab, show a red horizontal line indicating the current time for "today":
 
-**Desktop:** 在 `.cal-day-col` 中 absolute positioned 的紅線 + 時間標籤
-**Mobile:** 在 `.cal-m-events` 中插入 now indicator（紅點 + 線 + 時間標籤）
+**Desktop:** an absolutely positioned red line + time label inside `.cal-day-col`
+**Mobile:** insert a now-indicator (red dot + line + time label) inside `.cal-m-events`
 
 ```css
 .cal-now-line {
@@ -2540,15 +2591,15 @@ function initClocks() {
 }
 ```
 
-- 時間標籤顯示**目的地時區**（例如 "14:32 JST"），使用 `toLocaleString` 的 `timeZoneName:'short'` 取得時區縮寫
-- 位置計算：`top = (nowHour - HOUR_START) * 60` px（配合 60px/hour 的日曆格式）
-- 每 30 秒更新位置
+- The time label must display the **destination timezone** (e.g., "14:32 JST"); use `toLocaleString` with `timeZoneName:'short'` to get the abbreviation
+- Position: `top = (nowHour - HOUR_START) * 60` px (matches the 60px/hour calendar scale)
+- Update position every 30 seconds
 
 ---
 
-### Nomad Spots — 工作空間推薦 (if digital nomad mode)
+### Nomad Spots — Workspace Recommendations (if digital nomad mode)
 
-在 Checklist tab 底部顯示數位遊牧推薦工作地點：
+At the bottom of the Checklist tab, show recommended workspaces for digital-nomad mode:
 
 ```js
 const NOMAD_SPOTS = [
@@ -2564,7 +2615,7 @@ const NOMAD_SPOTS = [
 ];
 ```
 
-**渲染：**
+**Rendering:**
 ```
 ├── .nomad-section
 │   ├── .nomad-title (work icon + title + date range + local hours)
@@ -2575,44 +2626,44 @@ const NOMAD_SPOTS = [
 │           └── .ns-tags (free/wifi/power/hours/coverage pills)
 ```
 
-- Tags 使用 i18n keys（`nomad_free`, `nomad_wifi` 等）
-- 只在使用者有 work days 時顯示
+- Use i18n keys for tags (e.g., `nomad_free`, `nomad_wifi`)
+- Only render this section when the user has work days
 
 ---
 
-### Booking Tab 航班卡片 — 去回程航線視覺化 (MANDATORY)
+### Booking Tab Flight Card — Outbound/Return Route Visualization (MANDATORY)
 
-已預訂航班在 Booking tab 顯示為 **full-width flight card**，包含去回程航線圖：
+Booked flights must render in the Booking tab as a **full-width flight card**, including outbound and return route visualizations:
 
 ```
 ├── .booked-card.booked-card-wide.flight-card (grid-column:1/-1)
-│   ├── .booked-card-head (✈️ airline name + ✅已購 badge)
+│   ├── .booked-card-head (✈️ airline name + ✅ booked badge)
 │   ├── .flight-segments
-│   │   ├── .flight-seg (去程)
-│   │   │   ├── .flight-seg-badge "去程"
+│   │   ├── .flight-seg (outbound)
+│   │   │   ├── .flight-seg-badge "Outbound"
 │   │   │   └── .flight-seg-body
 │   │   │       ├── .flight-seg-route (departure → arrival visualization)
 │   │   │       │   ├── .flight-seg-point (time + city/terminal)
 │   │   │       │   ├── .flight-seg-arrow (line + flight code + duration)
 │   │   │       │   └── .flight-seg-point (time + city/terminal)
 │   │   │       └── .flight-seg-detail (date · terminal links)
-│   │   └── .flight-seg (回程) — same structure with .return badge
+│   │   └── .flight-seg (return) — same structure with a "Return" badge
 │   ├── .flight-footer (price + verdict badge)
 │   └── .flight-checkin-note (Web Check-in link + opening window)
 ```
 
-**必含資訊：**
-- 航班號碼、日期時間、航空公司
-- 出發/抵達機場航廈（每個航廈有 📍 Google Maps link）
-- **時區校正後的飛行時間**（見 Non-Negotiable Rule #22）
-- Web Check-in 連結 + 開放時間（例如「起飛前 48hr – 1hr」）
-- Flight verdict inline badge（來自 `flightIntel` 的 🟢/🟡/🔴 評價）
+**Required fields:**
+- Flight number, date/time, airline
+- Departure/arrival terminals (each terminal must include a 📍 Google Maps link)
+- **Timezone-corrected flight duration** (see Non-Negotiable Rule #22)
+- Web check-in link + check-in window (e.g., "48hr – 1hr before departure")
+- Flight verdict inline badge (🟢/🟡/🔴 rating from `flightIntel`)
 
 ---
 
 ### Development Server — serve.py
 
-生成的資料夾中包含一個簡易 Python 開發伺服器，方便本地預覽（`fetch` API 需要 HTTP server）：
+The generated folder must include a simple Python dev server for local preview (`fetch` requires an HTTP server):
 
 ```python
 import os, http.server, socketserver
@@ -2621,7 +2672,7 @@ with socketserver.TCPServer(('', 8765), http.server.SimpleHTTPRequestHandler) as
     s.serve_forever()
 ```
 
-同時在 `.claude/launch.json` 中設定 preview server：
+Also include a preview server config in `.claude/launch.json`:
 ```json
 {
   "version": "0.0.1",
@@ -2636,36 +2687,35 @@ with socketserver.TCPServer(('', 8765), http.server.SimpleHTTPRequestHandler) as
 }
 ```
 
-告知使用者：`python3 serve.py` 然後打開 `http://localhost:8765`。
+Tell the user: run `python3 serve.py`, then open `http://localhost:8765`.
 
 ---
 
 ## Output
 
-輸出為分離的檔案結構（**非** inline / single-file）：
+Output must be a multi-file folder structure (**not** inline / single-file):
 
 ```
 {destination}-{year}/
-├── index.html          ← HTML 結構 + inline JSON fallback
-├── style.css           ← 所有 CSS（分離檔案，非 inline）
-├── app.js              ← 所有 JS 邏輯（分離檔案，非 inline）
+├── index.html          ← HTML structure + inline JSON fallback
+├── style.css           ← all CSS (separate file; not inline)
+├── app.js              ← all JS logic (separate file; not inline)
 ├── data/
-│   └── trip.json       ← 旅程資料（canonical copy）
-├── serve.py            ← 本地開發伺服器
+│   └── trip.json       ← trip data (canonical copy)
+├── serve.py            ← local dev server
 └── .claude/
-    └── launch.json     ← Claude Code preview 設定
+    └── launch.json     ← preview config
 ```
 
-**外部依賴（CDN）：**
-- Leaflet CSS + JS（unpkg CDN）— 地圖
-- Google Fonts（Noto Sans TC/JP/KR + Material Symbols Outlined）— 字體 + 圖示
+**External dependencies (CDN):**
+- Leaflet CSS + JS (unpkg CDN) — maps
+- Google Fonts (Noto Sans TC/JP/KR + Material Symbols Outlined) — fonts + icons
 
-**Charts 使用純 CSS bar charts，不使用 Chart.js。**
+**Charts must be pure CSS bar charts (no Chart.js).**
 
-**index.html 必須包含 `<script id="trip-data" type="application/json">` 的 inline JSON fallback**，
-確保 `file://` protocol 也能正常運作（`fetch` 會失敗，fallback 到 inline data）。
+**`index.html` must include an inline JSON fallback via `<script id="trip-data" type="application/json">`**, so the page still works under the `file://` protocol (where `fetch` fails).
 
-Tell the user the folder path and suggest: `python3 serve.py` → `http://localhost:8765`。
+Tell the user the output folder path and suggest: `python3 serve.py` → `http://localhost:8765`.
 
 ---
 
@@ -2812,8 +2862,8 @@ If the user wants to modify an existing trip plan:
 - **Prices must be real** — search for actual current prices. Don't guess. If you can't find a
   price, mark it as "check on arrival" with a ⚠️ icon.
 - **Links must be real** — only include URLs you've verified through search. No made-up URLs.
-- **The HTML must work** — test your JS logic mentally. The checkbox-budget interaction is the
-  most important interactive feature; make sure the math works.
+- **The HTML must work** — test your JS logic mentally. The estimated/actual expense toggle and
+  currency switcher are the most important interactive features; make sure the math works.
 - **Save trip data as JSON** — embed all structured trip data in a `<script id="trip-data"
   type="application/json">` tag so the plan can be parsed and updated later.
 - **localStorage for cover photo** — use `trip-cover-photo` key to persist the user's uploaded
