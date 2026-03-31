@@ -78,6 +78,55 @@ If the user doesn't specify, use the existing default layout blueprint already d
 
 ---
 
+## Pre-Phase: Language Detection & Traveler Profile
+
+### Language Matching
+
+**Respond in whatever language the user opens the conversation with.** This is non-negotiable.
+Do NOT default to English unless the user wrote in English. Examples:
+- User writes in Traditional Chinese → respond entirely in Traditional Chinese (繁體中文)
+- User writes in Simplified Chinese → respond in Simplified Chinese (简体中文)
+- User writes in Japanese → respond in Japanese
+- User writes in Korean → respond in Korean
+- Mixed language → mirror the dominant language
+
+Maintain this language throughout ALL phases — all questions, summaries, the Phase 1 confirmation gate,
+and the final HTML output (tab labels, headings, all UI text).
+
+### Nationality Inference
+
+Infer the user's likely nationality from their language, and **use it to pre-fill smart assumptions**
+before asking. Do NOT assume blindly — infer first, then confirm with the passport question in Round 1.
+
+| Language | Inferred nationality | Default currency | Holiday calendar |
+|----------|---------------------|------------------|-----------------|
+| 繁體中文 (Traditional Chinese) | Taiwanese | TWD | Taiwan: Lunar New Year, Tomb Sweeping (清明), Dragon Boat, Mid-Autumn, 10/10 National Day |
+| 简体中文 (Simplified Chinese) | Mainland Chinese | CNY/RMB | China: Spring Festival golden week, May Day, National Day golden week (十一) |
+| 日本語 (Japanese) | Japanese | JPY | Japan: Golden Week (4/29–5/6), Obon (mid-Aug), Silver Week, Year-End/New Year |
+| 한국어 (Korean) | South Korean | KRW | Korea: Seollal, Chuseok, Children's Day (5/5), National holidays |
+| ภาษาไทย (Thai) | Thai | THB | Thai: Songkran (Apr), Royal holidays |
+| English | Ambiguous — many countries | Confirm with user | Confirm with user |
+
+Use inferred nationality to: pre-set currency display, skip asking obvious questions, tailor visa advice,
+and pre-populate the holiday calendar in the Booking tab. Always confirm via the passport question.
+
+### Vacation Habits — Ask in Round 1
+
+These questions belong **alongside the basics in Round 1** — vacation habits unlock the entire
+long-weekend optimization and trip-depth logic:
+
+| Field | How to ask | Why it matters |
+|-------|-----------|----------------|
+| 🗓️ Annual leave available | "How many days of annual leave do you have? And how many are you planning to use for this trip?" | Determines if the user can extend the trip or must minimize PTO |
+| 🏖️ Trip frequency | "Do you prefer saving up for one big trip a year, or taking frequent shorter trips?" | Big-trip user → pack more in; frequent traveler → can leave things for next time |
+| 📅 Date flexibility | "Are your dates fixed, or can you shift a few days to land on a long weekend?" | Unlocks long-weekend + holiday bridging optimization |
+| 🌍 Typical trip length | "What's your usual trip length? Weekend (2–3 days), short trip (4–5 days), or longer holiday (1–2 weeks)?" | Calibrates pacing and itinerary depth |
+
+Use these answers to shape trip pacing, PTO efficiency suggestions (Round 1.5 Sub-flow A),
+and whether to recommend squeezing in an extra city or slowing down.
+
+---
+
 ## Phase 1: Gather Trip Details
 
 This phase has **THREE rounds** of conversation. Do NOT skip any round — each constrains the next.
@@ -300,12 +349,36 @@ language. You should make **at least 8–10 searches** to build a comprehensive 
 
 **Source 1: Travel platforms (crawl for curated, bookable experiences)**
 
-- `site:klook.com {destination}` — then `WebFetch` the results page to extract top experiences,
+Hit ALL five platforms — each has different inventory and pricing:
+
+- `site:klook.com {destination}` — `WebFetch` the results page. Extract top experiences,
   prices, ratings, and categories. Look for "Top 10", "Must-visit", "Popular" pages.
 - `site:kkday.com {destination}` — same approach. KKday often has unique local experiences
   (e.g., cooking classes, private tours, cultural workshops) that Klook doesn't.
-- `site:getyourguide.com {destination}` — for Western-oriented destinations
-- `site:tripadvisor.com "{destination}" "things to do"` — for crowd-sourced rankings
+  Also search: `site:kkday.com "{destination} 一日遊"` or `"{destination} day tour"`.
+- `site:trip.com {destination} things to do` — Trip.com has strong Asia coverage and often
+  has exclusive deals for Chinese-speaking travelers; check their "Things to Do" and "Attractions" pages.
+- `site:getyourguide.com {destination}` — stronger for Western-oriented destinations.
+- `site:tripadvisor.com "{destination}" "things to do"` — crowd-sourced rankings and reviews.
+
+**Day Tours & City Passes — search these explicitly on every platform:**
+
+Many cities offer structured day tours and multi-attraction passes that are better value than
+buying tickets individually. You MUST search for these — they dramatically simplify planning:
+
+- Search: `"{destination} city pass"` — e.g., "Osaka Amazing Pass", "Fukuoka City Pass",
+  "Seoul City Pass", "Tokyo Metro Pass", "Visit Seoul Card"
+- Search: `"{destination} one-day tour"` or `"{destination} 一日遊 行程"`
+- Search on KKday: `"{destination} pass"`, `"{destination} 交通票券"`, `"{destination} 景點套票"`
+- Search on Klook: `"{destination} pass"`, `"{destination} attraction combo"`
+- Search on Trip.com: `"{destination} tour packages"`, `"{destination} 一日遊"`
+- Fetch the actual pass pages and extract: pass name, price, included attractions, validity period,
+  purchase link, and whether it includes public transit
+
+Present any found passes in the **Booking tab** as a comparison table (see Phase 5 booking spec).
+If a pass covers most of the user's selected must-go attractions, proactively recommend it:
+> "💡 The Osaka Amazing Pass (¥2,800/day) covers 8 of your 12 selected attractions including
+> Osaka Castle, Sumiyoshi Taisha, and unlimited subway rides. Let me add this to your booking tab."
 
 **Source 2: Official tourism websites**
 
@@ -997,12 +1070,46 @@ Post-optimization avg daily travel distance: Y km (save Z%)
 
 ## Phase 5: Generate the HTML
 
-Generate a self-contained HTML file from scratch. Do NOT use any template file — build the entire
-HTML inline using the layout blueprint below and populate it with the researched data.
+Generate a complete trip planner app as **分離的檔案結構**（`index.html` + `style.css` + `app.js` + `data/trip.json`）。
+Do NOT use any template file — build all files from scratch using the layout blueprint below and populate with the researched data.
 
 ### Data Language Rule
 
-**All content written to `trip.json` and other data files MUST be in English.** This includes descriptions, tips, notes, and all text fields. Translate non-English source material into English when storing. Place names should have both an English name and a `name_local` field for the local-language name.
+**`trip.json` 的文字欄位必須包含：使用者對話語言 + 目的地國家語言 + 英文。**
+
+- `name` 欄位使用使用者的對話語言（例如繁體中文使用者 → `name` 為中文）
+- 額外提供目的地國家語言欄位（例如去韓國 → `name_ko`，去日本 → `name_ja`）
+- 英文欄位永遠包含（`name_en`）
+- 同樣規則適用於所有文字欄位：`desc`、`note`、`tip`、`title` 等
+
+**範例：台灣使用者去韓國+日本**
+```json
+{
+  "name": "龍頭山公園+釜山塔",
+  "name_en": "Yongdusan Park + Busan Tower",
+  "name_ko": "용두산공원/부산타워",
+  "name_ja": "龍頭山公園+釜山タワー",
+  "nameLocal": "용두산공원/부산타워"
+}
+```
+
+**`nameLocal`** 保留為該景點所在國家的當地語言名稱（用於地圖標記、Google Maps 搜尋等）。
+
+**Schedule events 同理：**
+```json
+{
+  "name": "抵達金海機場",
+  "name_en": "Arrive Gimhae Airport",
+  "name_ko": "김해공항 도착",
+  "name_ja": "金海空港到着",
+  "note": "19:55 降落",
+  "note_en": "19:55 Landing",
+  "note_ko": "19:55 착륙",
+  "note_ja": "19:55 着陸"
+}
+```
+
+**Checklist items、budget items、tagline 等所有使用者可見文字皆遵循此規則。**
 
 ### Default Website Language
 
@@ -1510,7 +1617,12 @@ Mobile fallback (.calendar-mobile, shown <768px):
 │   └── .items-total (4px top border, right-aligned total)
 ```
 
-**Tab 4: Booking (Tickets & Reservations)**
+**Tab 4: Booking (Tickets & Reservations) — STATIC HTML（非動態渲染）**
+
+**IMPORTANT:** Booking tab 的內容直接寫在 `index.html` 中，**不是**從 `trip.json` 動態渲染。
+原因：航班卡片的航線視覺化、比價表格、建議購買等格式高度客製化，靜態 HTML 可精確控制排版。
+只有 flight verdict badge（`renderFlightIntel()`）和幣值切換（`data-cost` attribute）由 JS 動態更新。
+
 ```
 ├── .hdr
 ├── .booking-section "已預訂項目" (booked items)
@@ -1554,14 +1666,9 @@ Budget charts live inside the Budget tab. The overview tab contains today's itin
         NO hover effect (keep clean for mobile)
 ```
 
-**Tab 6: My Guide (Reviews)**
-```
-├── .hdr (with "export" button)
-└── .guide-section (border frame)
-    ├── .guide-head (star icon + count)
-    └── .review (stars + place name serif bold + text + mono date)
-        hover: muted background
-```
+**NOTE: There is NO Guide/Review tab.** The app has exactly 6 tabs:
+Overview (tab-attractions), Calendar (tab-calendar), Booking (tab-booking),
+Budget (tab-budget), Spots/Map (tab-time), Checklist (tab-checklist).
 
 #### Visual Design System
 
@@ -1902,7 +2009,7 @@ These are the **exact CSS patterns** to use. Copy them into the generated `<styl
 14. **Mobile padding is mandatory** — all content sections (charts, h-bars, cat-grid, items-table, section-labels) must have `padding: 0 16px` on mobile. Header and calendar also need top padding.
 15. **Category breakdown uses horizontal bars** — use `.h-bars` + `.h-bar-row` style (like city breakdown), NOT `.cat-card` icon boxes. This saves vertical space.
 16. **Budget item checkbox = done indicator** — checked items get `opacity:0.25; text-decoration:line-through`. The stats total shows full budget. The items-table bottom total shows the sum of CHECKED items (checked items total). Charts always show all items.
-17. **Cover page is OPTIONAL** — only include if the user explicitly requests it. By default, the page loads directly into the main app with no cover page.
+17. **Cover page is MANDATORY** — always included。預設使用深色漸層背景（`#1a1a2e`），使用者可透過右上角相機按鈕上傳自己的照片（存入 localStorage 持久化）。若 AI 無法生成封面圖，就使用純色/漸層背景讓使用者自行上傳。Cover page 是進入 app 的第一個畫面（Today overlay 之後），點擊 GO 或上滑進入主介面。
 18. **Live clocks on Calendar tab** — show real-time clocks in the calendar header: destination local time (primary, inverted black) + passport country time (secondary). Update every 30 seconds. Use `toLocaleTimeString` with `timeZone` option.
 19. **Now line on Calendar** — a red horizontal line (`#e8664a`) with a dot and time label showing the current **destination timezone** (e.g., "02:43 GMT+9" or "02:43 KST"). Use `toLocaleString('en-US', {timeZone: DEST_TZ, timeZoneName:'short'})` to get the timezone abbreviation. Updates every 30 seconds.
 20. **Time allocation is computed from schedule** — do NOT hardcode time data. Calculate total hours per category and city days from the actual `schedule` array in trip.json. Render dynamically via JS.
@@ -1944,8 +2051,8 @@ Core:
 - Currency switcher pills → update displayed amounts (home / dest / USD / EUR)
 - Filter chips → show/hide POIs by category or city
 - Print-friendly mode (hides interactive elements, clean layout)
-- Quick review (star rating + text) → localStorage persistence
 - Export to Google Maps: generate a shareable Google Maps link with all POIs as waypoints
+- Export GeoJSON: download all POIs as GeoJSON file for external map tools
 - NO dark mode toggle, NO floating action button (FAB)
 
 Mobile Bottom Bar (Tab Bar):
@@ -2109,15 +2216,456 @@ If a tab doesn't have enough data to be useful, it should not exist. But if it e
 
 ---
 
+### trip.json Complete Schema (MANDATORY)
+
+`data/trip.json` 是整個 app 的資料核心。以下為完整頂層結構，每個欄位皆為必填（除非標註 optional）：
+
+```json
+{
+  "destination": "釜山→阿蘇→福岡",
+  "tagline": {
+    "zh": "在櫻花盛開的季節，從海邊城市走進火山秘境",
+    "en": "From coastal city to volcanic wonders, under cherry blossoms",
+    "ko": "벚꽃이 만개하는 계절, 해변 도시에서 화산 비경으로",
+    "ja": "桜満開の季節、海辺の街から火山の秘境へ"
+  },
+  "startDate": "2026-03-30",
+  "endDate": "2026-04-12",
+  "currency": {
+    "home": "TWD",
+    "rates": { "KRW": 42, "JPY": 5, "USD": 0.031 }
+  },
+  "entryRequirements": [ ... ],
+  "flightIntel": { ... },
+  "holidays": { ... },
+  "pois": [ ... ],
+  "schedule": [ ... ],
+  "budget": { "items": [ ... ] },
+  "checklist": [ ... ]
+}
+```
+
+#### `entryRequirements[]` — 入境表單預填資料
+
+每個到訪國家一個 entry，包含需要線上填寫的入境表單：
+
+```json
+"entryRequirements": [
+  {
+    "country": "KR",
+    "name": { "zh": "🇰🇷 韓國", "en": "🇰🇷 Korea", "ko": "🇰🇷 한국", "ja": "🇰🇷 韓国" },
+    "items": [
+      {
+        "task": { "zh": "電子入境卡 e-Arrival Card", "en": "e-Arrival Card", "ko": "전자입국카드", "ja": "電子入国カード" },
+        "url": "https://www.e-arrivalcard.go.kr/",
+        "deadline": { "zh": "3/27 起可填（抵達前3天）", "en": "From 3/27 (3 days before arrival)", ... },
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "country": "JP",
+    "name": { "zh": "🇯🇵 日本", "en": "🇯🇵 Japan", ... },
+    "items": [
+      {
+        "task": { "zh": "Visit Japan Web", "en": "Visit Japan Web", ... },
+        "url": "https://www.vjw.digital.go.jp/",
+        "deadline": { "zh": "出發前隨時可填", "en": "Fill anytime before departure", ... },
+        "status": "pending"
+      }
+    ]
+  }
+]
+```
+
+- `status`: `"pending"` | `"done"` — 使用者可在 Today overlay 和 Checklist tab 勾選
+- 只包含**需要線上填表的項目**（e-Arrival Card、Visit Japan Web、ESTA 等），一般提醒放 checklist
+
+#### `flightIntel` — 機票歷史價格分析
+
+用於 Booking tab 的機票價格評估和 Today overlay 的航班資訊：
+
+```json
+"flightIntel": {
+  "route": "TPE ↔ PUS/FUK",
+  "userPrice": 19600,
+  "booked": true,
+  "monthlyPrices": [
+    { "month": "4月", "label": "Apr", "avg": 14500, "note": "淡季尾" },
+    { "month": "5月", "label": "May", "avg": 15200, "note": "" },
+    ...
+  ],
+  "range": { "low": 12000, "high": 28000, "avg": 21750 }
+}
+```
+
+- `userPrice`: 使用者實際購買價格（TWD）
+- `booked`: 是否已購買
+- `monthlyPrices`: 12 個月的歷史均價，用於繪製價格走勢圖
+- `range`: 12 個月的最低/最高/平均，用於計算 verdict（🟢低於均價/🟡接近/🔴高於）
+- `renderFlightIntel()` 在 Booking tab 的航班卡片上顯示 inline verdict badge
+
+#### `holidays` — 假期資料
+
+使用者所屬國家的假期，用於 Booking tab 的假期日曆和請假攻略：
+
+```json
+"holidays": {
+  "country": "TW",
+  "countryName": "台灣",
+  "items": [
+    {
+      "date": "2026-04-03",
+      "name": "清明節",
+      "days": "4/2–4/5 四天連假",
+      "tip": "請0天放4天",
+      "active": true
+    },
+    { "date": "2026-05-01", "name": "勞動節", "days": "5/1（五）", "tip": "請0天放3天" },
+    ...
+  ]
+}
+```
+
+- `active: true` 標記與此次旅程重疊的假期
+- `tip` 欄位提供請假攻略（「請 X 天放 Y 天」）
+
+#### `pois[]` — 景點資料
+
+```json
+{
+  "id": "b1",
+  "name": "龍頭山公園+釜山塔",
+  "name_en": "Yongdusan Park+Busan Tower",
+  "name_ko": "용두산공원/부산타워",
+  "name_ja": "龍頭山公園+釜山タワー",
+  "nameLocal": "용두산공원/부산타워",
+  "city": "busan",
+  "cat": "attraction",
+  "lat": 35.1008, "lng": 129.0325,
+  "price_krw": 7200, "price_twd": 173,
+  "hours": "09:00–22:00",
+  "desc": "⭐必去 · 3/31 09:30-10:30 · ₩7,200",
+  "addr": "南浦洞"
+}
+```
+
+- `city`: 小寫英文 key（`busan`, `aso`, `fukuoka`）— 用於 filter 和 map marker 分組
+- `cat`: `attraction` | `food` | `cafe` | `shopping` | `transport` | `work` | `hotel` | `other`
+- `price_krw`/`price_jpy`: 當地貨幣原價；`price_twd`: 換算後的家鄉貨幣價格
+- `nameLocal`: 景點所在國家的當地語言名稱（用於 Google Maps 搜尋）
+
+#### `schedule[]` — 每日行程
+
+```json
+{
+  "date": "2026-03-31",
+  "city": "釜山",
+  "events": [
+    {
+      "sh": 10, "eh": 12,
+      "name": "釜山電影體驗博物館",
+      "name_en": "Busan Cinema Experience Museum",
+      "name_ko": "부산영화체험박물관",
+      "name_ja": "釜山映画体験博物館",
+      "cat": "attraction",
+      "note": "₩10,000 · 龍頭山旁 · 室內",
+      "note_en": "₩10,000 · Next to Yongdusan · Indoor",
+      "note_ko": "₩10,000 · 용두산 옆 · 실내",
+      "note_ja": "₩10,000 · 龍頭山隣 · 室内",
+      "restaurant": "국제시장 돼지국밥",
+      "map": "https://www.google.com/maps/search/?api=1&query=...",
+      "reservation": false,
+      "booking_url": "https://...",
+      "booking_note": "Reservations open 2 weeks before"
+    }
+  ]
+}
+```
+
+- `sh`/`eh`: 開始/結束時間（小數，例如 10.5 = 10:30）— 使用當天城市的 local timezone
+- `city`: 中文城市名（用於 schedule 顯示，透過 `SCHEDULE_CITY_I18N` mapping 翻譯）
+- `restaurant`/`map`/`reservation`: 餐飲事件必填
+- `booking_url`/`booking_note`: 需預約項目 optional
+
+#### `budget.items[]` — 預算明細
+
+```json
+{
+  "name": "✈️ 機票來回 IT606+IT241",
+  "name_en": "✈️ Round-trip Flights IT606+IT241",
+  "name_ko": "✈️ 왕복 항공권 IT606+IT241",
+  "name_ja": "✈️ 往復航空券 IT606+IT241",
+  "city": "busan",
+  "cat": "transport",
+  "cost_twd": 19600,
+  "checked": false
+}
+```
+
+- `cost_twd`: 以使用者家鄉貨幣計價
+- `checked`: 預設 `false`，使用者勾選後 opacity 降低 + 刪除線，合計即時更新
+
+#### `checklist[]` — 行前清單（完整 i18n）
+
+```json
+[
+  {
+    "title": { "zh": "證件 & 簽證", "en": "Documents & Visa", "ko": "서류 & 비자", "ja": "書類 & ビザ" },
+    "items": [
+      { "zh": "護照有效期 6個月以上", "en": "Passport valid 6+ months", "ko": "여권 유효기간 6개월 이상", "ja": "パスポート有効期限6ヶ月以上" },
+      ...
+    ]
+  },
+  ...
+]
+```
+
+- 每個 group 有 `title`（i18n object）和 `items`（array of i18n objects）
+- 預設 groups：證件&簽證、金融&換匯、必裝 App（韓國）、必裝 App（日本）、網路&電力、行李&穿搭
+
+---
+
+### POI Detail Modal (MANDATORY)
+
+點擊景點列表中的 POI 時，彈出一個 **detail modal popup**，顯示完整景點資訊：
+
+```
+├── .poi-modal-overlay (fixed, inset:0, z-index:300, bg:rgba(0,0,0,.4))
+│   └── .poi-modal (centered card, max-width:480px, border-radius:var(--r))
+│       ├── .poi-modal-close (× button, top-right)
+│       └── #poi-modal-content
+│           ├── .poi-modal-header (category dot + name + nameLocal)
+│           ├── .poi-modal-section (info rows)
+│           │   ├── 📍 city · address
+│           │   ├── 🕐 hours
+│           │   ├── 💰 price (home currency + local currency)
+│           │   ├── 📋 description
+│           │   └── category badge (colored pill)
+│           └── .poi-modal-section "搜尋更多"
+│               └── .poi-modal-links (horizontal scroll)
+│                   ├── Google Maps (with favicon)
+│                   ├── Google Search (with favicon)
+│                   ├── Instagram (hashtag search)
+│                   ├── YouTube (search)
+│                   └── 小紅書 (search)
+```
+
+**行為：**
+- `openPOIModal(id)` — 從 `TRIP.pois` 找到 POI，渲染 modal 內容，同時呼叫 `focusPOI(id)` 平移地圖到該位置
+- 關閉方式：點擊 × 按鈕、點擊 overlay 背景、按 Escape 鍵
+- Mobile: 點擊 POI 後自動 scroll 到地圖（`scrollIntoView`）
+
+---
+
+### GeoJSON Export (MANDATORY)
+
+Overview tab header 的「匯出 GeoJSON」按鈕，點擊後下載所有 POIs 為 `.geojson` 檔案：
+
+```js
+function initExport() {
+  document.getElementById('btn-export-geojson').addEventListener('click', () => {
+    const geo = {
+      type: 'FeatureCollection',
+      features: TRIP.pois.map(p => ({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
+        properties: { name: p.name, nameLocal: p.nameLocal, description: p.desc, category: p.cat }
+      }))
+    };
+    const blob = new Blob([JSON.stringify(geo, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'trip-{destination}.geojson';
+    a.click();
+  });
+}
+```
+
+可匯入 Google My Maps、QGIS、Mapbox 等工具。
+
+---
+
+### Live Clocks — 雙時區即時時鐘 (MANDATORY)
+
+在 Calendar tab 的 header 右側顯示即時時鐘，每 30 秒更新：
+
+```
+├── .clock-wrap (destination timezone — primary, larger)
+│   ├── .cd-label "KR / JP"
+│   └── .cd-digits (HH : MM with HOUR/MIN sublabels)
+└── .clock-wrap (home timezone — secondary)
+    ├── .cd-label "台灣"
+    └── .cd-digits (HH : MM)
+```
+
+**實作要點：**
+```js
+const DEST_TZ = 'Asia/Tokyo';   // 目的地時區
+const HOME_TZ = 'Asia/Taipei';  // 護照國家時區
+
+function getTimeInTZ(tz) {
+  return new Date().toLocaleTimeString('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit' });
+}
+
+function initClocks() {
+  updateClocks();
+  renderNowLine();
+  setInterval(() => { updateClocks(); renderNowLine(); }, 30000);
+}
+```
+
+- 時區根據旅程涵蓋的國家自動設定
+- i18n: `clock_dest` 和 `clock_home` label 隨語言切換
+
+---
+
+### Now Line — 日曆當前時間線 (MANDATORY)
+
+在 Calendar tab 的今天欄位上顯示一條紅色水平線，標示目前時間：
+
+**Desktop:** 在 `.cal-day-col` 中 absolute positioned 的紅線 + 時間標籤
+**Mobile:** 在 `.cal-m-events` 中插入 now indicator（紅點 + 線 + 時間標籤）
+
+```css
+.cal-now-line {
+  position: absolute; left: 0; right: 0; height: 2px;
+  background: #e8664a; z-index: 5; pointer-events: none;
+}
+.cal-now-label {
+  position: absolute; left: -4px; top: -8px;
+  background: #e8664a; color: #fff; font-size: .65rem;
+  padding: 1px 6px; border-radius: 4px; font-weight: 600;
+  white-space: nowrap;
+}
+```
+
+- 時間標籤顯示**目的地時區**（例如 "14:32 JST"），使用 `toLocaleString` 的 `timeZoneName:'short'` 取得時區縮寫
+- 位置計算：`top = (nowHour - HOUR_START) * 60` px（配合 60px/hour 的日曆格式）
+- 每 30 秒更新位置
+
+---
+
+### Nomad Spots — 工作空間推薦 (if digital nomad mode)
+
+在 Checklist tab 底部顯示數位遊牧推薦工作地點：
+
+```js
+const NOMAD_SPOTS = [
+  {
+    name: 'Engineer Cafe',
+    addr: '天神 · 赤煉瓦文化館1F',
+    hours: '09:00–21:00',
+    mapQuery: 'エンジニアカフェ+福岡',
+    tags: ['nomad_free', 'nomad_wifi', 'nomad_power'],
+    coverage: 'nomad_coverage'
+  },
+  ...
+];
+```
+
+**渲染：**
+```
+├── .nomad-section
+│   ├── .nomad-title (work icon + title + date range + local hours)
+│   └── .nomad-spots
+│       └── .nomad-spot × N
+│           ├── .ns-name (workspace name)
+│           ├── .ns-addr (address · 📍 Google Maps link)
+│           └── .ns-tags (free/wifi/power/hours/coverage pills)
+```
+
+- Tags 使用 i18n keys（`nomad_free`, `nomad_wifi` 等）
+- 只在使用者有 work days 時顯示
+
+---
+
+### Booking Tab 航班卡片 — 去回程航線視覺化 (MANDATORY)
+
+已預訂航班在 Booking tab 顯示為 **full-width flight card**，包含去回程航線圖：
+
+```
+├── .booked-card.booked-card-wide.flight-card (grid-column:1/-1)
+│   ├── .booked-card-head (✈️ airline name + ✅已購 badge)
+│   ├── .flight-segments
+│   │   ├── .flight-seg (去程)
+│   │   │   ├── .flight-seg-badge "去程"
+│   │   │   └── .flight-seg-body
+│   │   │       ├── .flight-seg-route (departure → arrival visualization)
+│   │   │       │   ├── .flight-seg-point (time + city/terminal)
+│   │   │       │   ├── .flight-seg-arrow (line + flight code + duration)
+│   │   │       │   └── .flight-seg-point (time + city/terminal)
+│   │   │       └── .flight-seg-detail (date · terminal links)
+│   │   └── .flight-seg (回程) — same structure with .return badge
+│   ├── .flight-footer (price + verdict badge)
+│   └── .flight-checkin-note (Web Check-in link + opening window)
+```
+
+**必含資訊：**
+- 航班號碼、日期時間、航空公司
+- 出發/抵達機場航廈（每個航廈有 📍 Google Maps link）
+- **時區校正後的飛行時間**（見 Non-Negotiable Rule #22）
+- Web Check-in 連結 + 開放時間（例如「起飛前 48hr – 1hr」）
+- Flight verdict inline badge（來自 `flightIntel` 的 🟢/🟡/🔴 評價）
+
+---
+
+### Development Server — serve.py
+
+生成的資料夾中包含一個簡易 Python 開發伺服器，方便本地預覽（`fetch` API 需要 HTTP server）：
+
+```python
+import os, http.server, socketserver
+os.chdir('{project_directory}')
+with socketserver.TCPServer(('', 8765), http.server.SimpleHTTPRequestHandler) as s:
+    s.serve_forever()
+```
+
+同時在 `.claude/launch.json` 中設定 preview server：
+```json
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "trip-planner",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["serve.py"],
+      "port": 8765
+    }
+  ]
+}
+```
+
+告知使用者：`python3 serve.py` 然後打開 `http://localhost:8765`。
+
+---
+
 ## Output
 
-Save the HTML file to the user's working directory as `{destination}-trip-{YYYY-MM-DD}.html`.
-Tell the user the file path and suggest opening it in a browser.
+輸出為分離的檔案結構（**非** inline / single-file）：
 
-The file should be **fully self-contained** — all CSS inline, all JS inline, only external
-resources are Leaflet/OpenStreetMap tiles and Google Fonts CDN. Charts are pure CSS bars, not Chart.js.
-Output is split into a folder: `{destination}-{year}/index.html` + `style.css` + `app.js` + `data/trip.json`.
-Include inline JSON fallback in index.html for file:// protocol compatibility.
+```
+{destination}-{year}/
+├── index.html          ← HTML 結構 + inline JSON fallback
+├── style.css           ← 所有 CSS（分離檔案，非 inline）
+├── app.js              ← 所有 JS 邏輯（分離檔案，非 inline）
+├── data/
+│   └── trip.json       ← 旅程資料（canonical copy）
+├── serve.py            ← 本地開發伺服器
+└── .claude/
+    └── launch.json     ← Claude Code preview 設定
+```
+
+**外部依賴（CDN）：**
+- Leaflet CSS + JS（unpkg CDN）— 地圖
+- Google Fonts（Noto Sans TC/JP/KR + Material Symbols Outlined）— 字體 + 圖示
+
+**Charts 使用純 CSS bar charts，不使用 Chart.js。**
+
+**index.html 必須包含 `<script id="trip-data" type="application/json">` 的 inline JSON fallback**，
+確保 `file://` protocol 也能正常運作（`fetch` 會失敗，fallback 到 inline data）。
+
+Tell the user the folder path and suggest: `python3 serve.py` → `http://localhost:8765`。
 
 ---
 
@@ -2268,7 +2816,7 @@ If the user wants to modify an existing trip plan:
   most important interactive feature; make sure the math works.
 - **Save trip data as JSON** — embed all structured trip data in a `<script id="trip-data"
   type="application/json">` tag so the plan can be parsed and updated later.
-- **localStorage for reviews** — use a namespaced key like `trip-{destination}-{date}-reviews`
-  to avoid conflicts.
+- **localStorage for cover photo** — use `trip-cover-photo` key to persist the user's uploaded
+  cover page background image across reloads.
 - **All monetary values** should have a `data-cost` attribute on the DOM element for easy JS
   manipulation.
