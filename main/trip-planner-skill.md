@@ -65,6 +65,37 @@ screenshots, and other sources.
 This integration means users who collect research first get a much faster, more personalized
 planning experience, while users who start fresh still get the full guided workflow.
 
+---
+
+## Phase 0.5: Travel Research Review (Only When travel-research.json Exists)
+
+After silently reading `travel-research.json` in Phase 0, surface what was found before proceeding:
+
+**Step 1 — Show a compact summary table:**
+```
+已載入 {N} 筆旅遊研究資料：
+
+| # | 名稱               | 類型       | 城市   | 優先級        |
+|---|--------------------|------------|--------|---------------|
+| 1 | 青山1954           | food       | Busan  | recommended   |
+| 2 | 廣安里擴香瓶店     | shopping   | Busan  | recommended   |
+```
+(Use all items from `travel-research.json` items[])
+
+**Step 2 — Ask:**
+> "已有 **{N} 筆**旅遊資料。要在開始排行程前補充更多嗎？
+> （可以貼入景點連結、截圖、文字推薦，或直接說「**開始排行程**」）"
+
+**Step 3 — Loop until confirmed:**
+- If user provides new input: process it (same logic as travel-collector skill), append to `travel-research.json`, re-display updated table with new count, ask again
+- If user says "開始排行程", "繼續", "沒有了", "ok", or similar → proceed to Phase 1
+
+**Step 4 — Proceed to Phase 1** with all collected data.
+
+> **Skip Phase 0.5 entirely** if `travel-research.json` does not exist. Do not mention it.
+
+---
+
 ### UI Style Selection
 
 When generating the HTML output, offer the user a choice of visual styles from the `ui-style` skill
@@ -1443,7 +1474,8 @@ var getEvIcon = function(ev) {
   var name = (ev.name || '').toLowerCase() + ' ' + (ev.name_en || '').toLowerCase();
   if (name.match(/airport|flight|landing|takeoff|airplane/)) return 'flight';
   var CAT_ICONS = {attraction:'attractions', food:'restaurant', cafe:'coffee',
-    transport:'directions_transit', work:'laptop_mac', hotel:'hotel', shopping:'shopping_bag'};
+    transport:'directions_transit', work:'laptop_mac', hotel:'hotel', shopping:'shopping_bag',
+    personal:'bedtime'};
   return CAT_ICONS[ev.cat] || 'event';
 };
 ```
@@ -1637,6 +1669,103 @@ Mobile fallback (.calendar-mobile, shown <768px):
         └── .cal-m-event (3px black bar left + title + time)
 ```
 
+**Tab 2.5: Booking (id=tab-booking)** — confirmed bookings + ticket comparison + recommended to buy
+
+This tab is **fully data-driven** from `TRIP.booking` — no hardcoded HTML. All content is rendered by `renderBooking()` called at init.
+
+```
+├── .hdr (title: "票券比價" / localized, subtitle: "已購 / 未購 / 建議購買")
+├── .booking-section
+│   ├── .booking-section-title (checklist icon + "已預訂項目")
+│   └── .booked-grid #booking-confirmed  ← renderBooking() sets innerHTML
+│       Renders TRIP.booking.confirmed[] as .booked-card items:
+│       - type="flight": .booked-card-wide.flight-card with .flight-segments → .flight-seg[]
+│         Each seg: .flight-seg-badge + .flight-seg-body (.flight-seg-route + .flight-seg-detail)
+│         Flight footer: .booked-card-cost + #flight-verdict-inline (populated by renderFlightIntel())
+│         Flight checkin: .flight-checkin-note with link
+│       - type="ferry": .booked-card with meta rows + .booked-card-links (departure + arrival map links)
+│       - type="hotel": .booked-card with dates + price + optional map link
+│       - type="activity": .booked-card with desc + meetup + map link
+│       Badge classes: .booked-badge.done (confirmed) / .booked-badge.pending (pending)
+├── .booking-section
+│   ├── .booking-section-title (sell icon + "票券比價（未購）")
+│   └── #booking-comparison  ← renderBooking() sets innerHTML
+│       Renders TRIP.booking.comparison[] as .booking-table-wrap > .booking-table
+│       Columns: 項目 | 官網 | Klook | KKday | 建議
+│       Best-price cell gets: <span class="best-price">{price} <span class="star-mark">★</span></span>
+└── .booking-section
+    ├── .booking-section-title ("⏳ 建議購買")
+    └── .recommend-grid #booking-tobuy  ← renderBooking() sets innerHTML
+        Renders TRIP.booking.to_buy[] as .recommend-item (name + .rec-note)
+```
+
+**`renderBooking()` function contract:**
+```js
+function renderBooking() {
+  const bk = TRIP.booking;
+  if (!bk) return;
+  // 1. Set #booking-confirmed innerHTML from bk.confirmed[]
+  // 2. Call renderFlightIntel() to populate #flight-verdict-inline
+  // 3. Set #booking-comparison innerHTML from bk.comparison[]
+  // 4. Set #booking-tobuy innerHTML from bk.to_buy[]
+}
+```
+Called at init: `safe('renderBooking', renderBooking);`
+
+**`TRIP.booking` data schema:**
+```json
+"booking": {
+  "confirmed": [
+    {
+      "id": "bk1",
+      "type": "flight | ferry | hotel | activity",
+      "title": "Display name",
+      "status": "confirmed | pending",
+      // flight-specific:
+      "carrier": "Airline name", "carrier_code": "IT",
+      "segments": [
+        {
+          "label_i18n": "booking_outbound | booking_return",
+          "flight": "IT606",
+          "date": "YYYY-MM-DD",
+          "departure": {"airport": "TPE", "terminal": "T1", "city_zh": "桃園", "time": "16:40"},
+          "arrival":   {"airport": "PUS", "terminal": "T1", "city_zh": "金海", "time": "19:55"},
+          "duration": "2h15m",
+          "maps_dep": "https://www.google.com/maps/...",
+          "maps_arr": "https://www.google.com/maps/..."
+        }
+      ],
+      "checkin_url": "https://...",
+      "checkin_note_i18n": "booking_checkin_note",
+      // ferry-specific:
+      "date": "YYYY-MM-DD",
+      "departure": {"city": "釜山", "terminal": "碼頭名", "time": "20:00", "maps": "https://..."},
+      "arrival":   {"city": "福岡", "terminal": "碼頭名", "time": "07:30+1", "maps": "https://..."},
+      // hotel-specific:
+      "dates": "3/30–4/3", "price_per_night": "NT$706/晚", "maps_url": "https://...",
+      // activity-specific:
+      "date": "YYYY-MM-DD", "desc": "Description", "meetup": "Meeting point", "maps_url": "https://...",
+      // all types:
+      "price": "NT$19,600", "price_twd": 19600
+    }
+  ],
+  "comparison": [
+    {
+      "id": "cmp1",
+      "name": "景點名", "name_note": "副標題",
+      "prices": {"official": "₩12,000", "klook": "₩12,000", "kkday": "₩7,200"},
+      "best": "official | klook | kkday | null",
+      "verdict_i18n": "booking_kkday_save"
+    }
+  ],
+  "to_buy": [
+    {"id": "tb1", "name_i18n": "booking_rec_esim", "note_i18n": "booking_rec_esim_note"}
+  ]
+}
+```
+
+**New i18n key needed:** `booking_checkin_note` — the web check-in reminder text.
+
 **Tab 3: Expenses**
 
 The Expenses tab has two modes switchable via a toggle: **Estimated** (pre-trip budget) and **Actual** (real spending during the trip). Both modes share the same layout structure.
@@ -1759,6 +1888,7 @@ spacing, and selective use of inverted black sections — not through color or d
   --cat-transport: #4ab8c9;    /* teal */
   --cat-work: #6a6ad4;         /* indigo */
   --cat-other: #888;           /* gray */
+  --cat-personal: #c9b99a;     /* warm beige — wake-up times, meals, personal routines */
 
   /* Chart fill */
   --chart-bar: #D4D4D8;
@@ -1774,6 +1904,7 @@ cafe:       bg #ede3f5, text #6a3a9b
 work:       bg #e3e3f5, text #4a4a9b
 transport:  bg #e0f2f5, text #2a7a8a
 hotel:      bg #e3ecf8, text #2a5a9b
+personal:   bg #f5ede0, text #8a6a3a  ← wake-up / breakfast / personal events (border #e8d5b8)
 ```
 
 **Hard rules:** No dark mode toggle. No FAB (floating action button). No gradients. No colored
