@@ -1,0 +1,26 @@
+{
+  "name": "trip-planner-marketplace",
+  "owner": {
+    "name": "Harmony"
+  },
+  "metadata": {
+    "description": "Interactive travel planning toolkit",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "trip-planner-skill",
+      "description": "Research, plan, generate HTML travel guides, and deploy -- includes trip planner, travel collector, flight intelligence, UI styles, HTML generator, and deployer.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/trip-planner",
+        "./skills/travel-collector",
+        "./skills/flight-intelligence",
+        "./skills/trip-html-generator",
+        "./skills/ui-style",
+        "./skills/trip-deployer"
+      ]
+    }
+  ]
+}
