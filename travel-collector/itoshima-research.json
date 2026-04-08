@@ -1,0 +1,1615 @@
+{
+  "meta": {
+    "trip_name": "Itoshima",
+    "last_updated": "2026-04-06T00:00:00+08:00",
+    "total_items": 30
+  },
+  "items": [
+    {
+      "id": "r1",
+      "type": "cafe",
+      "name": "Beach Cafe SUNSET",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "糸島始祖級咖啡廳，門前的木亭是必拍點",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "ocean-view",
+          "iconic",
+          "photo-spot"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "海邊咖啡廳一人享受也很棒",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Beach+Cafe+SUNSET+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "must-visit",
+      "notes": null
+    },
+    {
+      "id": "r2",
+      "type": "cafe",
+      "name": "Bistro & Cafe TIME",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "就在沙灘上的白色貨櫃，景色極致",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "ocean-view",
+          "container-cafe"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "海邊咖啡廳一人享受也很棒",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "lunch",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Bistro+%26+Cafe+TIME+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r3",
+      "type": "cafe",
+      "name": "Current",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "充滿南國度假風情的烘焙餐廳",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "resort-vibe",
+          "bakery"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "烘焙咖啡廳一人自在",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "lunch",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Current+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r4",
+      "type": "cafe",
+      "name": "LONDON BUS CAFE",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "紅色倫敦巴士，專賣 Gelato",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "gelato",
+          "unique-concept"
+        ],
+        "must_order": [
+          "Gelato"
+        ],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "外帶小點一人OK",
+          "signature_dishes": [
+            {
+              "name": "Gelato",
+              "name_local": "ジェラート",
+              "price": null,
+              "description": "倫敦巴士造型店的招牌義式冰淇淋",
+              "must_try": true
+            }
+          ]
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "snack",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=LONDON+BUS+CAFE+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r5",
+      "type": "cafe",
+      "name": "Surf Side Cafe",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "寬敞的海邊空間，適合發呆",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "ocean-view",
+          "spacious"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "海邊咖啡廳一人享受也很棒",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Surf+Side+Cafe+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r6",
+      "type": "shopping",
+      "name": "Palm Beach The Gardens",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "集合多間店鋪的複合區，有著名的天使之翼",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "complex",
+          "photo-spot",
+          "angel-wings"
+        ],
+        "must_order": [],
+        "dining": null,
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Palm+Beach+The+Gardens+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "must-visit",
+      "notes": null
+    },
+    {
+      "id": "r7",
+      "type": "cafe",
+      "name": "Hona Cafe",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "超高鮮奶油鬆餅名店",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "pancake",
+          "cream"
+        ],
+        "must_order": [
+          "鮮奶油鬆餅"
+        ],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "甜點店一人享用也自在",
+          "signature_dishes": [
+            {
+              "name": "Whipped Cream Pancake",
+              "name_local": "生クリームパンケーキ",
+              "price": null,
+              "description": "超高鮮奶油堆疊的招牌鬆餅，視覺與味覺雙享受",
+              "must_try": true
+            }
+          ]
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "snack",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Hona+Cafe+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "must-visit",
+      "notes": null
+    },
+    {
+      "id": "r8",
+      "type": "cafe",
+      "name": "Beach Garden Granmare",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "2022年新開，所有座位都能看海",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "ocean-view",
+          "new"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "海邊咖啡廳一人享受也很棒",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "lunch",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Beach+Garden+Granmare+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r9",
+      "type": "cafe",
+      "name": "Itoshima Tea",
+      "name_local": "糸島茶房",
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "日式優雅風的鬆餅與咖啡",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "japanese-style",
+          "pancake"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "甜點店一人享用也自在",
+          "signature_dishes": [
+            {
+              "name": "Pancake",
+              "name_local": "パンケーキ",
+              "price": null,
+              "description": "店家主打的鬆餅品項",
+              "must_try": true
+            }
+          ]
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "snack",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Itoshima+Tea+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r10",
+      "type": "shopping",
+      "name": "Blue Roof",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "由民家改裝的果昔與雜貨店",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "smoothie",
+          "zakka"
+        ],
+        "must_order": [],
+        "dining": null,
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "snack",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Blue+Roof+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r11",
+      "type": "food",
+      "name": "PUKA PUKA KITCHEN",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "充滿手作感的溫暖海邊餐廳",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "handmade",
+          "ocean-view"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "海邊餐廳一人用餐也OK",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "lunch",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=PUKA+PUKA+KITCHEN+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r12",
+      "type": "cafe",
+      "name": "Moon Moon Moon Cafe",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "現代感的黃色建築，海景第一排",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "modern",
+          "ocean-view"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "海邊咖啡廳一人享受也很棒",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Moon+Moon+Moon+Cafe+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r13",
+      "type": "cafe",
+      "name": "Sunset Road Coffee",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "適合公路旅行的中繼站",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "roadside"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "咖啡廳一人自在",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Sunset+Road+Coffee+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r14",
+      "type": "food",
+      "name": "Sunflower",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "海邊的歐式餐館氣氛",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "european-style",
+          "ocean-view"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "海邊餐廳一人用餐也OK",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "lunch",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Sunflower+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r15",
+      "type": "cafe",
+      "name": "Nogita House",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Sunset Road / Seaside",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "隱密感十足的木造空間",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "hidden",
+          "wooden"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "咖啡廳一人自在",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Nogita+House+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r16",
+      "type": "cafe",
+      "name": "COFFEE UNIDOS",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "專業自烘豆，注重產地風味",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "specialty-roaster",
+          "single-origin"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "咖啡廳一人自在",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=COFFEE+UNIDOS+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r17",
+      "type": "cafe",
+      "name": "Kibisu-yashiki",
+      "name_local": "踵屋敷",
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "充滿神祕感與藝術氣息的老屋咖啡",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "art",
+          "old-house",
+          "mysterious"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "咖啡廳一人自在",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Kibisu-yashiki+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r18",
+      "type": "food",
+      "name": "TAIYO no SARA",
+      "name_local": "太陽の皿",
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "使用在地食材的高級自助料理",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "buffet",
+          "local-ingredients"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "自助餐形式、一人也可以",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "lunch",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=TAIYO+no+SARA+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "must-visit",
+      "notes": null
+    },
+    {
+      "id": "r19",
+      "type": "cafe",
+      "name": "Sugi Bee Garden",
+      "name_local": "杉養蜂園",
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "糸島限定的蜂蜜冰淇淋",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "honey",
+          "ice-cream",
+          "itoshima-exclusive"
+        ],
+        "must_order": [
+          "蜂蜜冰淇淋"
+        ],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "外帶小點一人OK",
+          "signature_dishes": [
+            {
+              "name": "Honey Ice Cream",
+              "name_local": "はちみつアイスクリーム",
+              "price": null,
+              "description": "糸島限定的蜂蜜冰淇淋，使用自家蜂蜜製作",
+              "must_try": true
+            }
+          ]
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "snack",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Sugi+Bee+Garden+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r20",
+      "type": "cafe",
+      "name": "Anko no furusato",
+      "name_local": "あんこのふるさと",
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "傳統紅豆甜點的現代呈現",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "anko",
+          "traditional-modern"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "外帶小點一人OK",
+          "signature_dishes": [
+            {
+              "name": "Anko Sweets",
+              "name_local": "あんこスイーツ",
+              "price": null,
+              "description": "傳統紅豆甜點的現代風格呈現",
+              "must_try": true
+            }
+          ]
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "snack",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Anko+no+furusato+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r21",
+      "type": "shopping",
+      "name": "Itoshima Kurashi",
+      "name_local": "糸島くらし×ここのき",
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "集合糸島職人作品的選物店",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "artisan",
+          "craft",
+          "select-shop"
+        ],
+        "must_order": [],
+        "dining": null,
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Itoshima+Kurashi+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "must-visit",
+      "notes": null
+    },
+    {
+      "id": "r22",
+      "type": "cafe",
+      "name": "Tabi Cafe",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "專為旅人設計，店內全是旅遊書",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "travel-books",
+          "traveler-friendly"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "咖啡廳一人自在",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Tabi+Cafe+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r23",
+      "type": "cafe",
+      "name": "Pets",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "質感寵物用品與咖啡結合",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "pet-goods",
+          "lifestyle"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "咖啡廳一人自在",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Pets+Cafe+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r24",
+      "type": "shopping",
+      "name": "Dover Art Museum",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "結合工坊與選物，非常有設計感",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "art",
+          "design",
+          "workshop"
+        ],
+        "must_order": [],
+        "dining": null,
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Dover+Art+Museum+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r25",
+      "type": "cafe",
+      "name": "Petani Coffee",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "深受當地人喜愛的溫馨自烘店",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "local-favorite",
+          "roaster"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "咖啡廳一人自在",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Petani+Coffee+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r26",
+      "type": "food",
+      "name": "Sumibi-yakizakana",
+      "name_local": "炭火焼魚",
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "極致的炭烤鮮魚定食",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "charcoal-grilled",
+          "fish",
+          "teishoku"
+        ],
+        "must_order": [
+          "炭烤鮮魚定食"
+        ],
+        "dining": {
+          "recommended_for": "1-2",
+          "solo_friendly": true,
+          "solo_note": "定食類型、一人OK",
+          "signature_dishes": [
+            {
+              "name": "Charcoal-Grilled Fish Set Meal",
+              "name_local": "炭火焼魚定食",
+              "price": null,
+              "description": "炭火慢烤的新鮮魚定食，是店家的招牌",
+              "must_try": true
+            }
+          ]
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "lunch",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Sumibi-yakizakana+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "must-visit",
+      "notes": null
+    },
+    {
+      "id": "r27",
+      "type": "food",
+      "name": "Duangjan",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "海邊的老屋泰式料理，氣氛絕佳",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "thai",
+          "old-house",
+          "ocean-view"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "海邊餐廳一人用餐也OK",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "lunch",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Duangjan+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r28",
+      "type": "cafe",
+      "name": "Oshirushi",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "簡約質感的點心工坊",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "minimalist",
+          "sweets"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "外帶小點一人OK",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "snack",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Oshirushi+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r29",
+      "type": "cafe",
+      "name": "Tana Cafe",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "位於深江地區，適合安靜看書",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "quiet",
+          "reading"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "咖啡廳一人自在",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Tana+Cafe+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": null
+    },
+    {
+      "id": "r30",
+      "type": "cafe",
+      "name": "Siro Coffee (Itoshima area)",
+      "name_local": null,
+      "location": {
+        "city": "Itoshima",
+        "area": "Maebaru / Shima / Fukae",
+        "address": null,
+        "lat": null,
+        "lng": null
+      },
+      "details": {
+        "description": "雖然靠近西新但常被列入糸島行程",
+        "price": null,
+        "price_value": null,
+        "price_currency": "JPY",
+        "hours": null,
+        "duration": null,
+        "tags": [
+          "minimalist"
+        ],
+        "must_order": [],
+        "dining": {
+          "recommended_for": "any",
+          "solo_friendly": true,
+          "solo_note": "咖啡廳一人自在",
+          "signature_dishes": []
+        },
+        "tips": [],
+        "booking_required": false,
+        "booking_url": null,
+        "reservation": {
+          "needed": false,
+          "confirmed": false,
+          "time": null,
+          "party_size": null,
+          "reference": null
+        },
+        "meal_slot": "none",
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Siro+Coffee+Itoshima"
+      },
+      "source": {
+        "type": "note",
+        "url": null,
+        "title": "@boku_magazine 糸島必訪100清單",
+        "collected_at": "2026-04-06T00:00:00+08:00"
+      },
+      "priority": "recommended",
+      "notes": "靠近西新，但常被列入糸島行程"
+    }
+  ],
+  "transport": [],
+  "accommodations": [],
+  "general_tips": [],
+  "passes_and_deals": []
+}

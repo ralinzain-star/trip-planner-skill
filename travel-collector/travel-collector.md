@@ -50,7 +50,7 @@ tosses them your way. You catch everything, organize it, and keep it ready.
 ### Text Notes
 - Parse free-form text for place names, recommendations, tips
 - Handle multiple languages (especially Traditional Chinese, Japanese, Korean, English)
-- Recognize patterns like "recommended by A", "must-visit", "must-go", price mentions
+- Recognize patterns like "A推薦的餐廳" (restaurant recommended by A), "必去" (must-visit), price mentions
 
 ### Multiple Items
 - A single input often contains multiple places/tips (e.g., a blog post listing "Top 10 cafes in Tokyo")
@@ -59,8 +59,20 @@ tosses them your way. You catch everything, organize it, and keep it ready.
 
 ## Data Format
 
-All extracted data goes into `travel-research.json` in the working directory. The file is an
-append-friendly structure — each invocation adds new entries without touching existing ones.
+### File Organization
+
+Research data is stored per-destination in the GitHub travel-collector folder:
+`/Users/harmony/Documents/GitHub/trip-planner-skill/travel-collector/`
+
+Each destination gets its own file named `{destination-slug}-research.json`, for example:
+- `busan-research.json` — all Busan items
+- `fukuoka-research.json` — all Fukuoka items
+- `itoshima-research.json` — all Itoshima items
+- `aso-research.json` — all Aso items
+
+When processing input that covers multiple destinations, split items into the appropriate
+destination files. Each file is an append-friendly structure — each invocation adds new entries
+without touching existing ones.
 
 ### Schema
 
@@ -86,13 +98,27 @@ append-friendly structure — each invocation adds new entries without touching 
       },
       "details": {
         "description": "One-line summary of what this is and why it's interesting",
-        "price": "Price info as text, e.g., '¥1,500/person' or 'Free'",
+        "price": "Price info as text, e.g., '¥1,500/人' or 'Free'",
         "price_value": null,
         "price_currency": "JPY | KRW | USD | TWD | EUR | etc.",
         "hours": "Opening hours if available",
         "duration": "Suggested visit duration, e.g., '1-2 hours'",
         "tags": ["cherry-blossom", "night-view", "must-visit", "local-favorite", ...],
         "must_order": ["Specific dishes or experiences to try"],
+        "dining": {
+          "recommended_for": "1-2 | 2-4 | 4+ | any — ideal party size",
+          "solo_friendly": true,
+          "solo_note": "e.g., 'counter seats available', 'ramen shop, perfect for solo', 'omakase minimum 2 people'",
+          "signature_dishes": [
+            {
+              "name": "Dish name",
+              "name_local": "Dish name in local language",
+              "price": "¥1,500",
+              "description": "Why this dish is recommended",
+              "must_try": true
+            }
+          ]
+        },
         "tips": ["Practical tips like 'go early to avoid crowds'"],
         "booking_required": false,
         "booking_url": "URL to book if applicable",
@@ -195,7 +221,7 @@ Continue numbering from the highest existing ID in the file.
 ### Priority Classification
 
 Assign priority based on context clues:
-- **must-visit**: User explicitly says "must visit", "must-go", "don't miss", or the source rates it very highly
+- **must-visit**: User explicitly says "必去", "must visit", "don't miss", or the source rates it very highly
 - **recommended**: Featured prominently in a blog post, high ratings, mentioned multiple times
 - **optional**: Listed as an alternative, "if you have time", lower ratings
 
@@ -203,7 +229,8 @@ Assign priority based on context clues:
 
 ### Step 1: Check for existing research file
 
-Look for `travel-research.json` in the working directory. If it exists, read it and continue
+Look for `{destination-slug}-research.json` in `/Users/harmony/Documents/GitHub/trip-planner-skill/travel-collector/`.
+Determine the destination from the input content. If the file exists, read it and continue
 numbering from where it left off. If not, create a new one.
 
 ### Step 2: Process the input
@@ -233,7 +260,7 @@ Based on input type:
 **Text note provided:**
 ```
 1. Parse for place names, recommendations, prices
-2. Identify the recommender if mentioned ("recommended by X", "my friend said")
+2. Identify the recommender if mentioned ("小明推薦", "my friend said")
 3. Create entries for each distinct recommendation
 4. Note "note" as the source type
 ```
@@ -247,12 +274,17 @@ For each extracted item:
 - If coordinates are missing but an address exists, note that geocoding is needed
 - Convert prices to a standard format when possible
 
-**Mandatory for food/restaurant items:**
+**Mandatory for food/restaurant/cafe items:**
 - Always assign `meal_slot` (lunch / dinner / breakfast / snack)
 - Always generate a `google_maps_url` using the format: `https://www.google.com/maps/search/?api=1&query={URL-encoded name}+{city}`
-- For restaurants that are popular, upscale, have limited seating, or sources mention "reservation recommended" / "reservation required", set `reservation.needed = true`
+- Always populate `dining` object:
+  - `recommended_for`: Ideal group size — "1-2" for ramen/counter shops, "2-4" for izakaya/sharing-style, "4+" for BBQ/hotpot/banquet, "any" if no preference
+  - `solo_friendly`: Whether a solo diner can comfortably eat here (true for counter seats, ramen shops, cafes, fast-casual; false for minimum party size requirements, sharing-only menus)
+  - `solo_note`: Brief explanation, e.g., "吧台座位、一人OK", "最低消費兩人份", "一人燒肉可"
+  - `signature_dishes`: Extract recommended/famous dishes from the source. Include dish name (bilingual if possible), price, short description, and whether it's a must-try
+- For restaurants that are popular, upscale, have limited seating, or sources mention "要預約" / "reservation recommended" / "予約" / "예약", set `reservation.needed = true`
 - When `reservation.needed = true`, immediately ask the user:
-  - "Reservation needed for {name}! Have you booked? What time? How many people?"
+  - "{name} 需要訂位！已經訂了嗎？幾點？幾位？"
   - Provide the Google Maps link for easy reference
   - If confirmed, populate `reservation.confirmed`, `reservation.time`, `reservation.party_size`
   - If not yet reserved, add to the confirmation output as a **reservation action item**
@@ -265,67 +297,69 @@ After processing all items, if a trip schedule exists (`trip.json` or similar), 
 
 For any day missing a meal, flag it in the confirmation output:
 ```
-Meal gaps found:
-  4/5 — Missing lunch (during Dazaifu + Yanagawa itinerary)
-  4/10 — Missing dinner
+用餐缺口：
+  4/5 — 缺午餐（太宰府+柳川行程中）
+  4/10 — 缺晚餐
 ```
 
-Suggest: "Want me to find restaurants for these days?" so the user can decide.
+Suggest: "要不要幫這幾天找餐廳？" so the user can decide.
 
 ### Step 4: Update the research file
 
-- Read the existing file (or create new)
+- Read the existing destination file (or create new)
 - Append new items to the appropriate arrays
 - Update `meta.last_updated` and `meta.total_items`
-- Write back to `travel-research.json`
+- Write back to `{destination-slug}-research.json` in `/Users/harmony/Documents/GitHub/trip-planner-skill/travel-collector/`
+- If input covers multiple destinations, update each destination file separately
 
 ### Step 5: Confirm to the user
 
-Show a concise summary of what was captured. Use this format:
+Show a concise summary of what was captured. Do NOT use emojis — keep the output clean and text-based.
+
+Use this format:
 
 ```
 Added to travel research ({trip_name}):
 
-{type_emoji} {name} — {description}
-   📍 {area/city} | 💰 {price} | ⏰ {hours}
-   🔗 [Google Maps]({google_maps_url}) | 🏷️ {priority} | Source: {source_type}
-   {if booking_url: 🎫 [Book here]({booking_url})}
+[{TYPE}] {name} — {description}
+   Location: {area/city} | Price: {price} | Hours: {hours}
+   Google Maps: {google_maps_url} | Priority: {priority} | Source: {source_type}
+   {if booking_url: Booking: {booking_url}}
 
 (repeat for each item)
 
 --- Reservation Action Items ---
-Reservation needed:
-  1. {restaurant_name} — {meal_slot} · [Google Maps]({url})
-     Have you booked? What time? How many people?
+需要訂位：
+  1. {restaurant_name} — {meal_slot} · Google Maps: {url}
+     已經訂位了嗎？幾點？幾位？
   (repeat for each reservation-needed item)
 
 --- Meal Gap Warnings ---
-Meal gaps found:
-  {date} — Missing {lunch/dinner} ({day_context})
-  (suggest: "Want me to find restaurants for these days?")
+用餐缺口：
+  {date} — 缺{lunch/dinner}（{day_context}）
+  (suggest: "要不要幫這幾天找餐廳？")
 
 Total items in research: {count}
 ```
 
-Type emojis:
-- attraction: `🎯`
-- food: `🍜`
-- cafe: `☕`
-- accommodation: `🏨`
-- transport: `🚃`
-- shopping: `🛍️`
-- tip: `💡`
-- activity: `🎿`
-- nightlife: `🌙`
-- pass/deal: `🎫`
+Type labels (no emojis):
+- attraction: `[ATTRACTION]`
+- food: `[FOOD]`
+- cafe: `[CAFE]`
+- accommodation: `[HOTEL]`
+- transport: `[TRANSPORT]`
+- shopping: `[SHOPPING]`
+- tip: `[TIP]`
+- activity: `[ACTIVITY]`
+- nightlife: `[NIGHTLIFE]`
+- pass/deal: `[PASS]`
 
 ## Language Handling
 
-- **All data written to `travel-research.json` MUST be in English.** Descriptions, tips, notes, and all text fields should be stored in English regardless of the source language. Translate non-English content when extracting.
-- Place names: use the English name as `name` and the local-language name as `name_local` (e.g., `name: "Dazaifu Tenmangu"`, `name_local: "太宰府天満宮"`)
-- Keep the JSON field names in English for consistency
 - Detect the user's language from their input
-- All summaries and confirmations shown to the user should match the user's conversation language
+- All summaries and confirmations should match the user's language
+- Place names should be bilingual when possible (e.g., "太宰府天滿宮 / 太宰府天満宮")
+- Keep the JSON field names in English for consistency
 
 ## Edge Cases
 
@@ -349,21 +383,21 @@ style from the `ui-style` skill. The ui-style skill lives at `/Users/harmony/Doc
 and has 30 professionally crafted design systems.
 
 **How to use:**
-1. Before generating HTML, ask the user: "What UI style do you want?" and present the top choices relevant
+1. Before generating HTML, ask the user: "要用什麼 UI 風格？" and present the top choices relevant
    to the output type (e.g., for data viz: Modern Dark, Swiss Minimalist, Minimal Dark, Cyberpunk)
 2. Read the chosen style's reference file from `ui-style/references/<style-name>.md`
 3. Apply the complete design system: colors, typography, spacing, borders, shadows, animations
 4. Follow the style's anti-patterns (e.g., Swiss Minimalist = zero border-radius, no shadows)
 
-If the user doesn't care or says "whatever" / "you pick", default to **Swiss Minimalist** for data-heavy outputs
+If the user doesn't care or says "隨便", default to **Swiss Minimalist** for data-heavy outputs
 and **Modern Dark** for immersive/visual outputs.
 
 ## Integration with Travel Planner
 
-The `travel-research.json` file is designed to be consumed by the `travel-planner` skill. When the
-user later plans their trip, the planner should:
+The per-destination `{destination}-research.json` files are designed to be consumed by the `travel-planner` skill.
+When the user later plans their trip, the planner should:
 
-1. Read `travel-research.json` to see what the user has already researched
+1. Read the relevant `{destination}-research.json` files from the travel-collector folder
 2. Use the pre-collected POIs, prices, and tips instead of searching from scratch
 3. Prioritize `must-visit` items when building the itinerary
 4. Include booking URLs and price comparisons already captured

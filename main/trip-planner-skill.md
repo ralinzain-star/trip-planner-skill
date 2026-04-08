@@ -521,6 +521,16 @@ options:
 
 - Food streets, night markets, famous restaurants worth a detour
 - "These aren't attractions but worth making a special trip to eat" — let the user flag which meals are priorities
+- **Party-size matching (MANDATORY)**: tag every restaurant recommendation with a party-size
+  suitability label based on the user's `companions` from Phase 1:
+  - `[Solo OK]` — counter seating, set meals, single-portion friendly
+  - `[Couples]` — table seating, intimate atmosphere
+  - `[Family]` — spacious, kid-friendly menu/chairs
+  - `[Groups OK]` — large tables, private rooms, or reservation-friendly
+  - `[⚠️ Not ideal for {party_type}: {reason}]` — if the restaurant doesn't match, explain why
+    but still show it (e.g., "⚠️ Solo: Korean BBQ, minimum 2-person portions")
+- **Crowd timing**: for popular restaurants, note peak wait times and suggest off-peak slots:
+  "This ramen shop has 30min waits at noon — go at 11:30 or 13:30 instead"
 
 ### Step 2c: Confirm Selections & Prioritize (TWO-STEP process)
 
@@ -636,15 +646,15 @@ Present a **day-by-day route plan** with explicit transit instructions between e
 
 > **📅 Day 1 (4/5 Saturday) — Asakusa & Ueno**
 >
-> | Time | Activity | Transit |
-> |------|----------|---------|
-> | 10:30 | 🛬 Arrive at Narita Airport | — |
-> | 11:00–12:10 | 🚃 Narita → Asakusa | Skyliner to Nippori, transfer to subway, 70min, ¥2,520 |
-> | 12:30 | 🏨 Check-in / Drop off luggage | Walk 5min |
-> | 13:00–14:30 | 📍 Senso-ji Temple + Nakamise Shopping Street | Walk 8min from hotel |
-> | 14:30–16:00 | 📍 Tokyo Skytree | Walk 15min from Senso-ji |
-> | 16:30–17:30 | 📍 Ueno Ameyoko Market | Subway 10min, ¥170 |
-> | 18:00 | 🍜 Dinner: Daikokuya Tempura | Walk 3min |
+> | Time | Activity | Transit | Crowd |
+> |------|----------|---------|-------|
+> | 10:30 | 🛬 Arrive at Narita Airport | — | — |
+> | 11:00–12:10 | 🚃 Narita → Asakusa | Skyliner to Nippori, transfer to subway, 70min, ¥2,520 | — |
+> | 12:30 | 🏨 Check-in / Drop off luggage | Walk 5min | — |
+> | 13:00–14:30 | 📍 Senso-ji Temple + Nakamise Shopping Street | Walk 8min from hotel | [MED] Midday crowds, but manageable on weekdays |
+> | 14:30–16:00 | 📍 Tokyo Skytree | Walk 15min from Senso-ji | [LOW] Post-lunch dip, shorter queues |
+> | 16:30–17:30 | 📍 Ueno Ameyoko Market | Subway 10min, ¥170 | [MED] Market starts to thin after 16:00 |
+> | 18:00 | 🍜 Dinner: Daikokuya Tempura | Walk 3min | [LOW] Pre-dinner-rush slot (peak 18:30-19:30) |
 >
 > **💰 Today's transport cost: ¥2,690** (35% of total transport budget)
 >
@@ -660,6 +670,18 @@ Present a **day-by-day route plan** with explicit transit instructions between e
 - Fixed/pre-booked items placed first, then fill gaps around them
 - **Every location change must have explicit transit**: mode, line name, time, cost
 - **Daily transport cost subtotal** — helps user decide on day pass
+- **Crowd-aware scheduling (MANDATORY):**
+  - Every attraction and restaurant row MUST include a Crowd column with a label:
+    `[LOW]` (green) / `[MED]` (amber) / `[HIGH]` (red) + one-line context
+  - **Intra-day ordering rule**: schedule popular attractions during their off-peak hours.
+    If an attraction's off-peak is early morning, put it first. If it's late afternoon, put it last.
+    Fill the middle of the day with lower-traffic spots.
+  - **Restaurant timing rule**: avoid peak dining hours to reduce wait times:
+    - Lunch: avoid 12:00–13:00 → suggest 11:30 or 13:30
+    - Dinner: avoid 18:00–19:30 → suggest 17:30 or 20:00
+  - If two popular attractions on the same day both have the same off-peak window (e.g., both
+    best visited early morning), FLAG it: "⚠️ Both Senso-ji and Tsukiji Outer Market are best
+    before 09:00 — recommend splitting across two days"
 - **Transit pass analysis**: "Today you took 5 subway rides totaling ¥1,100, day pass is ¥600 → buy a day pass and save ¥500!"
 - **Transfer hub highlights**: where to change between areas, with locker/food tips
 - Flag if a day looks too packed (> 5 spots) or too empty (< 2 spots)
@@ -778,7 +800,59 @@ Post-optimization avg daily travel distance: 8.7 km (save 29%)
 - The calendar tab should reflect the optimized route
 - The POI list should be sortable by day (showing the optimized order)
 
-### Step 3g: Cover Photo & Trip Tagline
+### Step 3g: Crowd-Aware Cross-Day Optimization (MANDATORY)
+
+After geographic optimization (Step 3f), perform a **second optimization pass based on crowd
+patterns**. This step uses the `crowd` data collected in Phase 4 (or preliminary estimates based
+on cultural knowledge rules if Phase 4 hasn't run yet — refine after Phase 4 completes).
+
+**Algorithm:**
+1. Identify which travel dates are weekends or local public holidays:
+   - Search: `"{destination country} public holidays {year}"`, `"{destination} 祝日 / 공휴일 {month}"`
+   - Mark each day: `weekday` / `weekend` / `holiday`
+2. For each attraction, check its `crowd.peak_days` and `crowd.off_peak_days`
+3. Apply swaps:
+   - Attractions with `peak_days: ["sat","sun"]` → move to weekdays when possible
+   - Weekends/holidays → assign nature spots, suburban areas, hiking trails (crowd-dispersed)
+   - Indoor attractions (museums, aquariums) → good for rainy days AND holiday overflow
+4. If a local festival/event falls during the trip dates → present TWO options to the user:
+   - **Avoid**: swap that area's itinerary to a different day
+   - **Embrace**: keep it, but warn about crowds and suggest arriving early
+
+**Cultural knowledge rules (apply when no specific data available):**
+- Japan: temples/shrines busiest on weekends + New Year + Obon; museums closed Mondays → Tuesdays busier
+- Korea: many museums closed Mondays; parks/palaces busiest on weekends; cherry blossom spots peak Sat-Sun
+- Thailand: temples busiest on Buddhist holidays; shopping malls busiest Fri-Sun evenings
+- Europe: museums busiest Sat-Sun + first-Sunday-free-entry days; restaurants busiest Fri-Sat evenings
+- General: school holidays = family attraction peaks; rainy days = indoor attraction surges
+
+**Output format:**
+```
+Crowd Optimization Analysis:
+
+✅ 4/1 (Tue) Gamcheon Culture Village — weekday, low crowd expected
+✅ 4/2 (Wed) Haeundae — weekday, beach will be quiet
+⚠️ 4/5 (Sat) Seomyeon Shopping District — Saturday peak, high crowds
+  💡 Swap with 4/3 (Thu) Taejongdae — outdoor spot, less affected by weekends
+
+🎌 4/3 is Arbor Day (KR public holiday):
+  → City attractions will be crowded
+  → Option A: Swap to suburban/nature itinerary this day
+  → Option B: Visit Yeouido Cherry Blossom Festival (crowded but worth it) — your call?
+
+Pre-optimization crowd exposure: 4 days with [HIGH] events
+Post-optimization crowd exposure: 1 day with [HIGH] events (festival day, user chose to embrace)
+```
+
+**Rules:**
+- Fixed/pre-booked items CANNOT be moved (same as geographic optimization)
+- Work days: only evening events can be rearranged
+- Sunset/night events must stay in the evening slot
+- Present as **suggestions** — user decides whether to adopt
+- This analysis runs AFTER geographic optimization; if a swap conflicts with geographic efficiency,
+  note the trade-off: "Moving X to Thursday saves crowds but adds 15min transit — worth it?"
+
+### Step 3h: Cover Photo & Trip Tagline
 
 Before finalizing Phase 3, ask the user:
 
@@ -800,7 +874,7 @@ The tagline appears on the Today overlay below the destination name.
 }
 ```
 
-### Step 3h: Entry Requirements Research (MANDATORY)
+### Step 3i: Entry Requirements Research (MANDATORY)
 
 **For every destination country, research and compile ALL entry requirements.** This is critical — missing an entry form can ruin a trip.
 
@@ -861,7 +935,7 @@ The tagline appears on the Today overlay below the destination name.
    ⏰ Can be filled anytime before departure
 ```
 
-### Step 3i: Entry Form Pre-fill Data (MANDATORY)
+### Step 3j: Entry Form Pre-fill Data (MANDATORY)
 
 For each entry form identified in Step 3h, **compile ALL fields the user needs to fill** using data already collected (flights, hotels, dates). Store as `entryForms` in trip.json.
 
@@ -892,8 +966,8 @@ For each entry form identified in Step 3h, **compile ALL fields the user needs t
 
 ### Phase 3 Confirmation Gate
 
-> **✅ Phase 3 Confirmed:** Daily routes + transit options + pass recommendations + route optimization + entry procedures + form data are all set.
-> Next I'll do deep research (ticket price comparison, restaurant recommendations, shopping guides, etc.), then generate the HTML after confirmation!
+> **✅ Phase 3 Confirmed:** Daily routes + transit options + pass recommendations + route optimization + crowd optimization + entry procedures + form data are all set.
+> Next I'll do deep research (ticket price comparison, restaurant recommendations, shopping guides, crowd data, etc.), then generate the HTML after confirmation!
 
 ---
 
@@ -945,6 +1019,7 @@ Search for each of these. Adapt search queries to the destination language when 
    - Admission price (adult/child/student if applicable)
    - How long to spend there
    - Tips (best time to visit, how to avoid crowds, photo spots)
+   - **Crowd intelligence** (see item 15 below for full spec)
 6. **Neighborhood guide** — for each attraction area, what's walkable nearby? Food streets,
    shopping areas, hidden gems, photo spots
 7. **Accommodation areas** — only if hotel NOT already booked. Which neighborhoods are best
@@ -980,6 +1055,8 @@ Search for each of these. Adapt search queries to the destination language when 
    - All links must be REAL, verified URLs to the actual product page — not just the homepage
 10. **Food & drink** — for each area in the route plan: must-try dishes, recommended restaurants,
     food markets, price ranges. Be specific: "Day 2 lunch recommendations (near Shinjuku):..."
+    **For each restaurant, also research party-size suitability** (see item 16 below for full spec).
+    Cross-reference with the user's `companions` from Phase 1 and tag each recommendation.
 11. **Shopping recommendations** — for EACH attraction area the user selected, what's worth
     buying nearby? Include: local specialties, souvenirs, drugstore must-buys, outlet/market
     recommendations, specific product names and price ranges. This is NOT generic — research
@@ -998,6 +1075,104 @@ Search for each of these. Adapt search queries to the destination language when 
     - Wifi speed (if available), power outlet availability, seating comfort
 13. **Weather** for the travel dates — pack suggestions
 14. **Safety tips** — scam alerts, areas to avoid, emergency numbers
+15. **Crowd intelligence (MANDATORY)** — for EACH selected attraction AND restaurant:
+   Research busyness patterns and store as a `crowd` object on the POI in trip.json.
+
+   **Search strategy (run for every POI):**
+   - Search: `"{attraction name}" popular times` — Google Maps Popular Times data often appears
+     in search results as "Popular times" snippets or in travel blogs referencing the data
+   - Search: `"{attraction name}" best time to visit avoid crowds`
+   - Search: `"{attraction name}" 混雑 / 혼잡 / 人多` (in destination language)
+   - Search: `"{attraction name}" wait time queue`
+   - For restaurants: `"{restaurant name}" wait time queue line` and `"{restaurant name}" reservation`
+
+   **Data to extract per POI (store in `crowd` field):**
+   ```json
+   {
+     "crowd": {
+       "peak_hours": ["10:00-14:00"],
+       "off_peak_hours": ["07:00-09:00", "16:00-18:00"],
+       "best_visit_window": "08:00-09:30",
+       "peak_days": ["sat", "sun", "holidays"],
+       "off_peak_days": ["tue", "wed", "thu"],
+       "crowd_level": "high",
+       "wait_time_peak": "15-20 min queues for photos",
+       "wait_time_offpeak": "Almost no queues",
+       "tips": ["Tue-Thu least crowded", "Afternoon backlit — go in morning for photos"],
+       "seasonal_note": "Cherry blossom season (Mar-Apr) 2-3x normal crowds",
+       "source": "Google Maps Popular Times + travel blogs"
+     }
+   }
+   ```
+
+   **`crowd_level` classification:**
+   - `"high"`: famous landmarks, iconic temples, peak-season attractions, Instagrammable spots
+   - `"medium"`: popular but manageable, local favorites, shopping streets
+   - `"low"`: hidden gems, off-beaten-path, nature areas, neighborhood spots
+
+   **Fallback rules (when no specific data found):**
+   - Temples/shrines: weekends + morning = peak; early morning (before 08:00) = off-peak
+   - Markets/food streets: weekends + midday = peak; weekday mornings = off-peak
+   - Museums: closed-day+1 = compensatory peak; weekday afternoons = off-peak
+   - Nature/outdoor: weather-dependent; weekends = peak; weekday any time = off-peak
+   - Shopping streets: Fri evening + weekends = peak; weekday mornings = off-peak
+   - Restaurants: 12:00-13:00 lunch peak, 18:00-19:30 dinner peak; off-peak = ±1 hour
+
+   **After collecting all crowd data, refine the Phase 3 itinerary:**
+   - Update the Step 3g crowd optimization with real data (replacing preliminary estimates)
+   - Flag any itinerary conflicts: "Data shows X is HIGH on Saturday but currently scheduled for
+     Saturday — recommend swapping to Thursday (LOW)"
+
+16. **Restaurant party-size suitability (MANDATORY)** — for EACH recommended restaurant:
+   Research and assess whether the restaurant suits the user's group size (collected in Phase 1
+   `companions` field: solo / couple / family / group + count).
+
+   **Search strategy:**
+   - Search: `"{restaurant name}" seating counter table seats`
+   - Search: `"{restaurant name}" solo dining` or `"{restaurant name}" group dining`
+   - Search: `"{restaurant name}" 一人 OK / ひとり / 혼밥` (for solo in JP/KR)
+   - Check Google Maps reviews for mentions of seating capacity, wait times, party sizes
+
+   **Data to extract per restaurant (store in `dining` field on the POI):**
+   ```json
+   {
+     "dining": {
+       "party_size": {"min": 1, "max": 2, "ideal": "solo-friendly"},
+       "seating": "counter 8 seats + 3 tables (4-seat)",
+       "solo_friendly": true,
+       "group_friendly": false,
+       "group_min_seats": 4,
+       "min_order_note": null,
+       "wait_time_peak": "weekday 10min, weekend 30-40min",
+       "wait_time_offpeak": "no wait",
+       "tips_solo": ["Counter seating available, perfect for solo diners"],
+       "tips_group": ["Only 3 tables — groups of 4+ will wait 30min+, consider splitting"],
+       "warnings": []
+     }
+   }
+   ```
+
+   **Matching rules based on `companions`:**
+   - **Solo traveler**: prioritize restaurants with counter seating, set meals (teishoku/定食),
+     single-portion dishes. AVOID restaurants where the menu is designed for sharing (e.g., Korean
+     BBQ with minimum 2-person portions, Chinese hot pot, large-plate family style). If a sharing-
+     oriented restaurant is highly recommended, note: "This place is best for 2+ people. For solo,
+     consider {alternative} nearby instead." Also flag: portions that are too large for one person.
+   - **Couple (2 people)**: most restaurants work. Flag places with only counter seating (less
+     romantic) and recommend table-seating alternatives when available.
+   - **Family with kids**: flag restaurants with: high chairs available, kid-friendly menu, enough
+     space for strollers. AVOID: tiny izakayas, standing-only bars, restaurants with no kids policy.
+   - **Group (4+ people)**: AVOID small shops with fewer than 15 seats total — groups will wait
+     excessively or split awkwardly. Prioritize: restaurants with private rooms (個室/包廂),
+     large tables, or reservation-friendly policies. If a small famous shop is must-try,
+     suggest: "Visit in shifts of 2, or go at off-peak time (see crowd data)."
+
+   **Presentation in Phase 2/3 recommendations:**
+   - Tag each restaurant: `[Solo OK]` `[Couples]` `[Family]` `[Groups OK]` `[Groups: reserve needed]`
+   - If a restaurant does NOT match the user's party size, still show it but with a warning:
+     `[⚠️ Solo: menu designed for 2+ people, sharing required]`
+     `[⚠️ Group of 5: only 8 counter seats, expect 30min+ wait]`
+   - Do NOT silently exclude restaurants — let the user decide, but make the trade-off clear
 
 ### Research Quality Rules
 
@@ -1135,6 +1310,22 @@ Post-optimization avg daily travel distance: Y km (save Z%)
 
 **This audit must run every time a trip is generated or modified.** It's not optional.
 
+### Crowd & Party-Size Final Validation (part of Route Efficiency Audit)
+
+After the geographic audit, also validate:
+
+**Crowd check:**
+- For each day, count how many events fall within their `crowd.peak_hours`
+- Flag any day with 2+ events scheduled during peak: "⚠️ Day 3 has 3 attractions all during
+  their peak hours — consider time-shifting or swapping with off-peak days"
+- Verify weekend/holiday assignments: popular attractions should be on weekdays when possible
+
+**Restaurant party-size check:**
+- Scan all food events and verify `dining.party_size` compatibility with user's `companions`
+- Flag mismatches: "⚠️ Day 5 dinner at {restaurant} only seats 8 at counter — your group of 5
+  will likely wait 30+ min. Consider {alternative} which has tables for groups."
+- Ensure solo travelers aren't scheduled at sharing-required restaurants without alternatives noted
+
 ---
 
 ## Phase 5: Generate the HTML
@@ -1210,7 +1401,7 @@ Example for a Taiwanese user visiting Korea & Japan: `zh`, `en`, `ko`, `ja`
      nav_calendar:    { zh:'Itinerary', en:'Itinerary', ko:'Itinerary (ko)', ja:'Itinerary (ja)' },
      nav_more:        { zh:'More', en:'More', ko:'More (ko)', ja:'More (ja)' },
      // Stats
-     stat_total:      { zh:'Est. Total', en:'Est. Total', ko:'Est. Total (ko)', ja:'Est. Total (ja)' },
+     stat_total:      { zh:'實際花費', en:'Total Spent', ko:'총 지출', ja:'実際の費用' },
      // Categories
      cat_food:        { zh:'Food', en:'Food', ko:'Food (ko)', ja:'Food (ja)' },
      // Clock
@@ -1225,7 +1416,7 @@ Example for a Taiwanese user visiting Korea & Japan: `zh`, `en`, `ko`, `ja`
 2. **`data-i18n` attributes on ALL HTML elements** — every translatable text in index.html:
    ```html
    <span data-i18n="nav_attractions">概覽</span>
-   <div class="st-label" data-i18n="stat_total">Est. Total</div>
+   <div class="st-label" data-i18n="stat_total">實際花費</div>
    <button class="pill" data-i18n="cal_week1">Week 1（3/30–4/5）</button>
    ```
 
@@ -1257,6 +1448,20 @@ Example for a Taiwanese user visiting Korea & Japan: `zh`, `en`, `ko`, `ja`
    ```
 
 6. **`translateCity(cityStr)` helper** — translates free-form city names in the schedule
+
+6b. **`getField(obj, field)` helper** — generic multilingual field getter for ANY object:
+   ```js
+   function getField(obj, field) {
+     if (currentLang !== 'zh') {
+       var localized = obj[field + '_' + currentLang];
+       if (localized) return localized;
+     }
+     return obj[field];
+   }
+   ```
+   Use for: `getField(poi, 'desc')`, `getField(poi, 'addr')`, `getField(missed, 'reason')`,
+   `getField(changelog, 'lesson')`, `getField(dining, 'party_label')`, etc.
+   This replaces all `isZh ? x.reason : x.reason_en` patterns.
 
 7. **`applyLang()` function** — called on language switch, MUST:
    - Update all `[data-i18n]` elements
@@ -1459,6 +1664,10 @@ Layout:
   - Evening (`dark_mode` icon): events with `sh >= 18`
   - Empty periods are omitted
 - Each event is a `today-todo-item` card showing: smart icon + event name + time range + note + restaurant info with 📍 Maps link
+- **Crowd alert**: if the NEXT upcoming event has `crowd.crowd_level === "high"` AND the current
+  time falls within its `crowd.peak_hours`, show a warning card above the event list:
+  `"⚠️ {attraction} is in peak hours right now. Consider {nearby cafe/shop from along-the-way
+  recommendations} for 30-60 min first."` Use `groups` Material Symbol icon for the crowd indicator.
 - Active event (currently in progress) gets brighter card bg: `background:rgba(255,255,255,.22)`
 - "Enter trip planner →" button at bottom (left-aligned)
 
@@ -1589,7 +1798,8 @@ scrollable main content area. Each tab is a `<div class="tab-panel">` toggled vi
     ├── <div class="tab-panel" id="tab-booking">  ← ticket price comparison tab
     ├── <div class="tab-panel" id="tab-budget">
     ├── <div class="tab-panel" id="tab-time">  ← SPOTS/MAP tab (filters + map + POI list)
-    └── <div class="tab-panel" id="tab-checklist">
+    ├── <div class="tab-panel" id="tab-checklist">
+    └── <div class="tab-panel" id="tab-retro">  ← post-trip retrospective (hidden until trip ends)
 ```
 
 **Sidebar icons (top to bottom):** `travel_explore` (Overview) → `calendar_month` → `sell` → `wallet` → `map` (Spots) → `checklist`
@@ -1614,6 +1824,15 @@ function showTab(id) {
 │   NOTE: NO hero banner image. Starts directly with compact h1 + meta text.
 ├── .stats (4-col grid, inverted black bg, white text)
 │   └── .st (label → big number → subtitle) × 4
+│       Stats bar shows ACTUAL spending, NOT estimates:
+│       - "Total Spent" (actual) — sum of all actual_expenses + purchased items.
+│         If no actual data yet (pre-trip), show "–"
+│       - "POI Count" — number of attractions
+│       - "Daily Avg" (actual) — total actual spend ÷ trip days (excl. flights/hotel).
+│         If no actual data yet, show "–"
+│       - "Work Days" (if nomad mode) or other relevant stat
+│       Pre-trip fallback: before any actual expenses are logged, display "–" for
+│       monetary values. Once actual_expenses has data, compute from real numbers.
 ├── .info-box (cherry blossom / seasonal info)
 ├── .time-countdown-wrap #time-countdown (countdown timer — ticks every second)
 ├── .today-card #today-card (today's itinerary summary — JS rendered)
@@ -1624,9 +1843,31 @@ function showTab(id) {
 │           └── .today-ev (.past=opacity:.4, .current=font-weight:600)
 └── .weather-forecast-strip #weather-strip (14-day horizontal scroll weather cards)
     └── .weather-strip-scroll (overflow-x:auto)
-        └── .weather-day × 14 (Material weather icon + temp + desc + sunrise/sunset + golden hour)
+        └── .weather-day × 14 (Material weather icon + temp + desc + sunrise/sunset + golden hour + city label)
             .weather-day.today gets border-color:var(--text) highlight
 ```
+
+**Weather strip city label** — each card must show the city the traveler is in that day as a visible text label (not just a tooltip dot). Use `.wd-city-row` wrapper containing `.wd-city-dot` + `.wd-city-label.wd-city-{city}`:
+
+```js
+// In renderWeatherStrip(), replace the plain wd-city-dot line with:
+'<div class="wd-city-row">' +
+  '<div class="wd-city-dot" title="' + getCityName(w.city) + '"></div>' +
+  '<span class="wd-city-label wd-city-' + w.city + '">' + getCityName(w.city) + '</span>' +
+'</div>'
+```
+
+```css
+/* City-aware dot + label colors */
+.wd-city-dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);flex-shrink:0}
+.wd-city-row{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:6px}
+.wd-city-label{font-size:.58rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52px}
+.wd-city-label.wd-city-busan{color:#3a7bd5} .wd-city-row:has(.wd-city-busan) .wd-city-dot{background:#3a7bd5}
+.wd-city-label.wd-city-aso{color:#2e7d32}  .wd-city-row:has(.wd-city-aso) .wd-city-dot{background:#2e7d32}
+.wd-city-label.wd-city-fukuoka{color:#c0392b} .wd-city-row:has(.wd-city-fukuoka) .wd-city-dot{background:#c0392b}
+```
+
+City labels must reflect **the city the traveler is actually in on that date** — read from `WEATHER_DATA[].city` which is populated from the trip schedule in Phase 4. The label is localized via `getCityName(w.city)` → `t('city_' + city)`.
 
 **IMPORTANT: All icons must be Material Symbols Outlined (`<span class="mi material-symbols-outlined">`).
 NO emoji anywhere in the UI.** Weather icons use: `clear_day`, `partly_cloudy_day`, `rainy`, `grain`, `cloudy`.
@@ -1668,6 +1909,36 @@ Mobile fallback (.calendar-mobile, shown <768px):
     └── .cal-m-events
         └── .cal-m-event (3px black bar left + title + time)
 ```
+
+**Weather Strip — City-Labeled Cards (mandatory)**
+
+Each day in `WEATHER_DATA[]` has a `city` field (e.g. `"busan"`, `"aso"`, `"fukuoka"`).
+This city determines **both** the dot color **and** a visible city label below each weather card.
+The label must be **always visible** (not just a tooltip), using this exact markup:
+
+```js
+'<div class="wd-city-row">' +
+  '<div class="wd-city-dot" title="' + getCityName(w.city) + '"></div>' +
+  '<span class="wd-city-label wd-city-' + w.city + '">' + getCityName(w.city) + '</span>' +
+'</div>'
+```
+
+CSS for the city strip:
+```css
+.wd-city-dot { width:6px; height:6px; border-radius:50%; background:var(--text-3); flex-shrink:0 }
+.wd-city-row { display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px }
+.wd-city-label { font-size:.58rem; font-weight:600; letter-spacing:.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:52px }
+
+/* Per-city colors — add one rule per city in the trip */
+.wd-city-label.wd-city-busan  { color:#3a7bd5 }
+.wd-city-row:has(.wd-city-busan)  .wd-city-dot { background:#3a7bd5 }
+.wd-city-label.wd-city-aso    { color:#2e7d32 }
+.wd-city-row:has(.wd-city-aso)    .wd-city-dot { background:#2e7d32 }
+.wd-city-label.wd-city-fukuoka{ color:#c0392b }
+.wd-city-row:has(.wd-city-fukuoka) .wd-city-dot { background:#c0392b }
+```
+
+**Rule:** City labels must reflect the city the traveler is **actually in** on that date — read from `WEATHER_DATA[].city`, not assumed from the itinerary header.
 
 **Tab 2.5: Booking (id=tab-booking)** — confirmed bookings + ticket comparison + recommended to buy
 
@@ -1842,9 +2113,37 @@ Key rules:
         NO hover effect (keep clean for mobile)
 ```
 
-**NOTE: There is NO Guide/Review tab.** The app has exactly 6 tabs:
+**Tab 6: Retro (Post-Trip Retrospective)**
+```
+├── .hdr (title: "Trip Retro" / localized)
+├── .retro-map-section (one illustrated map per city — Remotion-generated video)
+│   ├── .retro-city-selector (pill buttons: one per city visited)
+│   └── .retro-map-container (16:9 video player or animated canvas)
+│       └── <video> or Remotion Player — animated illustrated route map
+├── .retro-budget-section (budget review)
+│   ├── .retro-budget-header ("Budget Review" + overall verdict badge)
+│   ├── .retro-budget-comparison (estimated vs actual side-by-side bars)
+│   ├── .retro-budget-highlights (what went well — green cards)
+│   └── .retro-budget-overruns (where you overspent — amber cards with reasons)
+├── .retro-missed-section (missed attractions + next-trip suggestions)
+│   ├── .retro-missed-header ("For Next Time")
+│   ├── .retro-missed-list (POIs that were planned but not visited)
+│   │   └── .retro-missed-item (name + reason skipped + "save for next trip" action)
+│   └── .retro-next-trip (AI-generated next-trip suggestions based on what was missed)
+└── .retro-changelog-section (plan vs reality)
+    ├── .retro-changelog-header ("What Changed")
+    ├── .retro-changelog-timeline (vertical timeline of modifications)
+    │   └── .retro-change-item (date + what changed + why + impact)
+    └── .retro-lessons (AI-generated planning lessons for next trip)
+```
+
+**Retro tab visibility:** This tab is HIDDEN during pre-trip and during-trip phases. It only
+appears in the sidebar/bottom-bar navigation AFTER the trip end date has passed (check against
+`TRIP.endDate`). On the trip's last day, show a prompt: "Trip is ending! Start your retro?"
+
+**NOTE:** The app has exactly 7 tabs:
 Overview (tab-attractions), Calendar (tab-calendar), Booking (tab-booking),
-Budget (tab-budget), Spots/Map (tab-time), Checklist (tab-checklist).
+Budget (tab-budget), Spots/Map (tab-time), Checklist (tab-checklist), Retro (tab-retro).
 
 #### Visual Design System
 
@@ -2132,18 +2431,68 @@ These are the **exact CSS patterns** to use. Copy them into the generated `<styl
 **Every single piece of text visible to the user MUST be translatable.** This includes:
 
 1. **Static HTML text**: Use `data-i18n="key"` attribute
-2. **JS-rendered text**: Use `t('key')` function
+2. **JS-rendered text**: Use `t('key')` function — NEVER hardcode `isZh ? '中文' : 'English'`
+   inline in JS. All strings must go through the I18N dictionary.
 3. **Data-driven text** (from trip.json): Add `name_en`, `name_ko`, `name_ja` fields alongside `name` (Chinese)
 4. **Budget items**: Each item needs `name_en`, `name_ko`, `name_ja`
 5. **Schedule events**: Each event needs `name_en/ko/ja` and `note_en/ko/ja`
 6. **Checklist items**: Each item is an object with `{zh, en, ko, ja}` translations
 7. **Chart labels**: Category names via `getCatName()`, city names via `getCityName()`
 8. **Entry form field labels**: Each label is `{zh, en, ko, ja}`
+9. **POI fields — ALL of these must have `_en`, `_ko`, `_ja` variants in trip.json:**
+   - `desc` → `desc_en`, `desc_ko`, `desc_ja` (POI description/status text)
+   - `addr` → `addr_en`, `addr_ko`, `addr_ja` (neighborhood/address)
+   - `hours` → keep as-is (numbers are universal), but translate labels like "全天" → "All day"
+   - `dining.party_label` → `dining.party_label_en`, `_ko`, `_ja`
+   - `dining.tips_solo` → `dining.tips_solo_en`, `_ko`, `_ja` (arrays)
+   - `dining.seating` → `dining.seating_en`, `_ko`, `_ja`
+   The renderer (`renderPOIs`) must use a helper like `getField(poi, 'desc')` that returns the
+   correct language version based on `currentLang`.
+10. **Retro tab data — ALL retro text must be multilingual:**
+    - `retro.changelog[].description` / `description_en` / `description_ko` / `description_ja`
+    - `retro.changelog[].reason` / `reason_en` / `reason_ko` / `reason_ja`
+    - `retro.changelog[].lesson` / `lesson_en` / `lesson_ko` / `lesson_ja`
+    - `retro.missed_pois[].reason` / `reason_en` / `reason_ko` / `reason_ja`
+    - `retro.missed_pois[].suggestion` / `suggestion_en` / `suggestion_ko` / `suggestion_ja`
+    - `retro.planning_lessons[]` → each is `{zh, en, ko, ja}`
+    - `retro.budget_review` notes → `note_zh`, `note_en`, `note_ko`, `note_ja`
+    - All JS-rendered labels in `renderRetro()` must use `t('key')`, NOT inline ternaries
 
-**Zero tolerance for untranslated text.** If switching to any language shows Chinese/mixed text, it's a bug.
+11. **Booking tab data — ALL booking fields must be multilingual:**
+    - `booking.confirmed[].title` → `title_en`, `title_ko`, `title_ja`
+    - `booking.confirmed[].carrier` → keep as-is (airline names are universal)
+    - Flight segment labels: "去程"/"回程" → use i18n keys `booking_outbound`/`booking_return`
+    - Terminal/airport names: `city_zh` → add `city_en`, `city_ko`, `city_ja`
+    - Status badges: "已購"/"待購" → use i18n keys `booking_purchased`/`booking_pending`
+    - Flight verdict: "低於均價"/"高於均價" → use i18n keys
+    - Check-in note: must be translated
+    - Hotel/ferry/tour titles and descriptions: all need `_en`, `_ko`, `_ja` variants
+    - Comparison table verdict text: use i18n keys, NOT hardcoded Chinese
+    - Recommended purchases: `name_i18n` and `note_i18n` keys must exist in I18N dictionary
+12. **POI names — primary/secondary display logic:**
+    - `zh` mode: show `name` (Chinese) as primary, `nameLocal` as secondary
+    - `en` mode: show `nameLocal` as primary (it's the romanized/local name), `name` as secondary
+    - `ko` mode: show `nameLocal` as primary, `name` as secondary
+    - `ja` mode: show `nameLocal` as primary, `name` as secondary
+    - The renderer must swap primary/secondary based on `currentLang`
+    - For the "next trip" and retro sections: POI names follow the same swap logic
+
+**Zero tolerance for untranslated text.** If switching to any language shows Chinese/mixed text
+or untranslated text from another language, it's a bug. Test by switching to EVERY supported
+language and scrolling through EVERY tab — no Chinese should appear in English mode, no English
+should appear in Korean mode, etc.
+
+**i18n verification checklist (run before declaring generation complete):**
+1. Switch to each language (zh, en, ko, ja)
+2. Visit EVERY tab: Overview, Calendar, Booking, Budget, Spots, Checklist, Retro
+3. Check: no text from other languages visible
+4. Check: POI names show correct primary/secondary
+5. Check: booking cards, flight labels, status badges all translated
+6. Check: retro changelog, lessons, missed POIs all translated
+7. Check: dining badges, party-size labels all translated
 
 **applyLang() must re-render ALL dynamic content:**
-- `renderPOIs()`, `renderCalendar()`, `renderBudget()`, `renderChecklist()`, `renderEntryForms()`, `renderNomadSpots()`, `renderToday()`, `updateClocks()`, `renderOverviewExtras()` (today card + weather strip)
+- `renderPOIs()`, `renderCalendar()`, `renderBudget()`, `renderChecklist()`, `renderEntryForms()`, `renderNomadSpots()`, `renderToday()`, `updateClocks()`, `renderOverviewExtras()`, `renderRetro()`
 
 ##### Responsive Breakpoints
 
@@ -2252,6 +2601,16 @@ Schedule / Calendar Tab:
 - Each activity has a resize handle at the bottom to adjust duration
 - "All day" events shown in header row, not time grid
 - Work blocks shown in distinct style (if nomad mode)
+- **Crowd indicator on each event block**: small badge in top-right corner of the calendar event:
+  - `LOW` — green dot (#4aad5b), font-size 0.6rem
+  - `MED` — amber dot (#e8964a)
+  - `HIGH` — red dot (#e8664a)
+  - Hover/tap shows tooltip: "Best: 08:00-09:30 | Peak: 10:00-14:00 | Tip: go early"
+  - Data source: `crowd.crowd_level` from the POI matching the event
+- **Restaurant party-size badge on food events**: small icon after the restaurant name:
+  - Solo-friendly: `person` icon (green)
+  - Group-friendly: `groups` icon (green)
+  - Mismatch warning: `warning` icon (amber) + tooltip explaining the issue
 
 Expenses Tab:
 - Mode toggle: [Estimated] [Actual] pill buttons at top
@@ -2268,10 +2627,29 @@ POI / Attractions Tab:
 - Click POI → opens a **detail modal popup** with:
   - Full name (Chinese + local name), address, hours, price, description
   - Category badge with color
+  - **Crowd section** (if POI has `crowd` data):
+    - Visual busyness bar chart (CSS horizontal bars, one per hour from opening to closing):
+      each bar's width represents relative busyness (like Google Maps Popular Times).
+      Color: green (low) → amber (medium) → red (high). Current hour highlighted if during trip.
+    - "Best time" badge: green pill showing `crowd.best_visit_window`
+    - "Avoid" badge: red pill showing `crowd.peak_hours`
+    - Tips list from `crowd.tips[]`
+    - Seasonal note if applicable
+  - **Dining section** (if POI is food/cafe category and has `dining` data):
+    - Party size suitability: icon badges — `[Solo OK]` `[Couples]` `[Groups OK]` with
+      green/amber/red coloring based on match with user's `companions` setting
+    - Seating info: `dining.seating` text (e.g., "Counter 8 seats + 3 tables")
+    - Wait time: `dining.wait_time_peak` / `dining.wait_time_offpeak`
+    - Tips for user's party size (from `dining.tips_solo` or `dining.tips_group`)
+    - Warning banner if restaurant doesn't match party size (amber background)
   - Social media search links: Google Maps, Google, Instagram (hashtag search), YouTube, Xiaohongshu
   - Also pans the Leaflet map to that location
 - Color-coded dot by category
 - Filter chips at top
+- **Crowd filter**: in addition to category and city filters, add a crowd-level filter:
+  `[All]` `[Low crowd]` `[Med]` `[High]` — lets user see only low-crowd spots
+- **Party-size filter** (for food/cafe POIs): `[All]` `[Solo OK]` `[Groups OK]` — filters
+  restaurants by suitability for the user's travel party
 - **Alerts/Warnings (⚠️)**: POIs can have an optional `warnings` array in trip.json.
   Each warning is `{text: "Important notice", severity: "info|warn|danger"}`.
   If a POI has warnings:
@@ -2294,11 +2672,13 @@ Booking Table (below map in Attractions tab):
 
 The generated HTML must include ALL of these content sections, distributed across the 5 tabs.
 
-**The first tab IS the Overview tab** (id=tab-attractions, icon=travel_explore) containing trip header, stats, countdown, today card, and weather strip. **The Spots/Map tab** (id=tab-time, icon=map) has filters + full-height map + POI list. **NO Guide/review tab.** 6 tabs total: Overview, Calendar, Booking, Budget, Spots, Checklist.
+**The first tab IS the Overview tab** (id=tab-attractions, icon=travel_explore) containing trip header, stats, countdown, today card, and weather strip. **The Spots/Map tab** (id=tab-time, icon=map) has filters + full-height map + POI list. **The Retro tab** (id=tab-retro, icon=auto_stories) is hidden until after the trip ends. 7 tabs total: Overview, Calendar, Booking, Budget, Spots, Checklist, Retro (post-trip only).
 
 **Attractions Tab:**
 1. Trip header (destination, dates, duration, description) — NO hero banner image
-2. Stats bar (total budget, attraction count, daily average, work hours if nomad)
+2. Stats bar (actual total spent, attraction count, actual daily average, work hours if nomad).
+   Shows ACTUAL spending from `budget.actual_expenses`. If no actual data exists yet (pre-trip),
+   display "–" for monetary values. Never show estimated/planned numbers in the stats bar.
 3. Filter chips (by city, by category)
 4. Interactive map (Leaflet/OpenStreetMap with colored circle markers + "Export to Google Maps" button)
 5. POI list with checkboxes (name, address, city, price)
@@ -2381,6 +2761,254 @@ The generated HTML must include ALL of these content sections, distributed acros
     - **Connectivity**: eSIM/SIM card setup, wifi backup
 17. Digital nomad workspaces (if nomad mode): name, address, wifi, tags
 
+**Retro Tab (Post-Trip Retrospective — visible only after trip ends):**
+
+This tab is the trip's retrospective journal. It appears ONLY after `TRIP.endDate` has passed.
+It consists of four sections: animated city map, budget review, missed attractions, and changelog.
+
+18. **Illustrated Route Map (Remotion-generated animated video)**
+
+    One animated map video per city visited. Each video shows:
+    - The city's geographic outline as a soft illustrated background (watercolor/hand-drawn style,
+      similar to illustrated travel maps — NOT a standard Leaflet/OpenStreetMap tile)
+    - POIs the user actually visited, appearing one by one in chronological order with:
+      - An illustrated icon per category (temple icon, food icon, camera icon, shopping bag, etc.)
+      - The place name in hand-lettered style typography
+      - A dotted/dashed route line animating between POIs showing the day's path
+      - Day number badge ("Day 1", "Day 2") as each day's route starts
+    - The city name in large display font at the top with the country flag
+    - Warm, friendly color palette — watercolor textures, soft shadows, organic shapes
+    - Total duration: 15-30 seconds per city (longer for more POIs)
+
+    **Remotion project structure** (generated alongside the HTML in a `retro-video/` subfolder):
+    ```
+    retro-video/
+    ├── package.json          (remotion + @remotion/cli dependencies)
+    ├── src/
+    │   ├── Root.tsx           (Remotion root — registers all compositions)
+    │   ├── CityMap.tsx        (main composition: animated illustrated map)
+    │   ├── components/
+    │   │   ├── MapBackground.tsx    (city outline + watercolor texture)
+    │   │   ├── POIMarker.tsx        (animated POI icon + label appearing)
+    │   │   ├── RouteLine.tsx        (animated dashed line between POIs)
+    │   │   ├── DayBadge.tsx         (Day N badge animation)
+    │   │   └── CityTitle.tsx        (city name + flag header)
+    │   ├── data/
+    │   │   └── trip-retro.json      (extracted from trip.json: visited POIs, routes, dates)
+    │   └── styles/
+    │       └── maps.module.css
+    ├── remotion.config.ts
+    └── render.sh              (script to render all city videos: npx remotion render ...)
+    ```
+
+    **Data flow:**
+    - Read `trip.json` → extract POIs grouped by city with `visited: true` flag
+    - Each POI needs: `lat`, `lng`, `name`, `cat`, `day_number`, `visit_order`
+    - Route lines connect POIs in visit order within each day
+    - The Remotion composition uses `useCurrentFrame()` + `interpolate()` for staggered animations
+
+    **Rendering options (present to user):**
+    - `npm run render` → generates MP4 per city in `retro-video/out/`
+    - Generated videos are embedded in the HTML Retro tab as `<video>` elements
+    - Fallback: if user doesn't want to set up Remotion, generate a static illustrated map
+      using pure CSS/SVG with the same visual style (no animation, but same aesthetic)
+
+    **City selector:** pill buttons above the video player — one per city. Clicking swaps the
+    video source. Default: first city visited.
+
+    **Map visual style:**
+    - Background: soft cream/parchment (#f5f0e8) with subtle paper texture
+    - City outline: light gray watercolor wash
+    - POI icons: hand-drawn style, colored by category (same category colors as main app)
+    - Route line: dashed, dark gray (#444), animated with `strokeDashoffset`
+    - Typography: rounded sans-serif or hand-lettered style (Google Fonts: "Caveat" or "Patrick Hand")
+    - Country flag: top-left corner, small
+    - Overall mood: warm, personal, journal-like — NOT technical or corporate
+
+19. **Budget Review Section**
+
+    Compares estimated budget (from Phase 1-4 planning) against actual spending (from Expenses
+    tab's actual mode data). Tells the user WHERE and WHY they went over or under budget.
+
+    **Data source:** `trip.json` → `budget.items` (estimated) vs `budget.actual_expenses` (actual)
+
+    **Layout:**
+    ```
+    ┌─────────────────────────────────────────────┐
+    │  Budget Verdict: [UNDER BUDGET by NT$3,200]  │  ← green badge if under, amber if over
+    │  Estimated: NT$45,000  →  Actual: NT$41,800  │
+    └─────────────────────────────────────────────┘
+
+    ┌── What Went Well ──────────────────────────┐
+    │ ✅ Transport: saved NT$2,100 by buying      │
+    │    Nishitetsu Pass (estimated ¥8,000 →      │
+    │    actual ¥5,200 with pass)                  │
+    │ ✅ Food: stayed within budget — good mix of  │
+    │    street food and sit-down meals            │
+    └─────────────────────────────────────────────┘
+
+    ┌── Where You Overspent ─────────────────────┐
+    │ ⚠️ Shopping: +NT$4,500 over budget          │
+    │    → Olive Young haul (NT$3,200) was        │
+    │      unplanned. Consider setting a firmer   │
+    │      shopping cap next time.                │
+    │ ⚠️ Attractions: +NT$800 over budget         │
+    │    → Added an extra boat tour on Day 5      │
+    │      that wasn't in the original plan.      │
+    └─────────────────────────────────────────────┘
+    ```
+
+    **Analysis logic (generated by AI during trip planning, stored in trip.json):**
+    - Compare each category's estimated vs actual total
+    - Categories where actual < estimated → "What Went Well" card (green left border)
+    - Categories where actual > estimated by >10% → "Where You Overspent" card (amber left border)
+    - For each overspend, explain WHY (cross-reference changelog to find what was added/changed)
+    - Include actionable advice: "Next time, budget NT$X for shopping" or "The city pass saved you
+      money — use this strategy again"
+
+    **Per-city breakdown:** horizontal bars showing estimated (outline) vs actual (filled) per city
+
+20. **Missed Attractions — Next Trip Seeds**
+
+    Shows POIs that were in the plan but didn't get visited (user unchecked them, or they were
+    in the 🔄 "if time allows" tier and time ran out), plus attractions that were researched
+    but not selected in Phase 2.
+
+    **Data source:**
+    - `trip.json` → `pois[]` where `visited: false` or `status: "skipped"`
+    - Phase 2 recommendations that the user didn't select (stored in `retro.unselected_pois`)
+
+    **Layout:**
+    ```
+    ┌── Didn't Make It This Time ────────────────┐
+    │                                             │
+    │ 📍 Taejongdae — skipped (rain on Day 3)    │
+    │    "Outdoor cliff walk, best on sunny day.  │
+    │     Save for spring/fall visit."            │
+    │    [Save for next trip ♡]                   │
+    │                                             │
+    │ 📍 Gamcheon Culture Village sunset — ran    │
+    │    out of time on Day 2                     │
+    │    "Go on a weekday morning instead.        │
+    │     Crowds are 3x lighter before 09:00."    │
+    │    [Save for next trip ♡]                   │
+    │                                             │
+    └─────────────────────────────────────────────┘
+
+    ┌── Next Trip Ideas ─────────────────────────┐
+    │                                             │
+    │ Based on what you loved this trip (nature,  │
+    │ food, photography), here are suggestions:   │
+    │                                             │
+    │ 🗺️ If you return to Busan:                 │
+    │   • Taejongdae (skipped) + Igidae coastal   │
+    │     walk — combine for a full nature day    │
+    │   • Gijang market for fresh seafood         │
+    │                                             │
+    │ 🗺️ If you visit nearby cities:             │
+    │   • Gyeongju (2hr from Busan) — temples +   │
+    │     tombs, perfect for your culture interest │
+    │   • Tongyeong — coastal town, less touristy │
+    │                                             │
+    └─────────────────────────────────────────────┘
+    ```
+
+    **"Save for next trip" action:** clicking ♡ stores the POI in `localStorage` under a
+    `next-trip-seeds` key. These can be exported or loaded by the travel-collector skill
+    for the next trip to the same destination.
+
+21. **Changelog — Plan vs Reality**
+
+    A timeline showing every modification from the original itinerary to what actually happened.
+    This helps the user understand their own planning patterns and improve for next time.
+
+    **Data source:** `trip.json` → `retro.changelog[]` — an array of change events:
+    ```json
+    {
+      "retro": {
+        "changelog": [
+          {
+            "date": "2026-04-02",
+            "day": 3,
+            "type": "swap",
+            "description": "Swapped Taejongdae (outdoor) with ARTE Museum (indoor)",
+            "description_en": "Swapped Taejongdae (outdoor) with ARTE Museum (indoor)",
+            "reason": "rain",
+            "impact": "positive",
+            "lesson": "Always have indoor backup for outdoor days"
+          },
+          {
+            "date": "2026-04-03",
+            "day": 4,
+            "type": "add",
+            "description": "Added spontaneous boat tour at Songdo",
+            "reason": "local recommendation",
+            "impact": "neutral",
+            "lesson": "Leave 2-3hr buffer per day for spontaneous discoveries"
+          },
+          {
+            "date": "2026-04-05",
+            "day": 6,
+            "type": "skip",
+            "description": "Skipped Gamcheon sunset — too tired after shopping",
+            "reason": "fatigue",
+            "impact": "negative",
+            "lesson": "Don't schedule 5+ spots on shopping days — energy runs out"
+          }
+        ],
+        "planning_lessons": [
+          "Leave buffer time: your best moments were unplanned discoveries",
+          "Weather flexibility: having indoor/outdoor alternatives saved 2 rainy days",
+          "Shopping days need fewer attractions — you consistently ran out of energy",
+          "The crowd-avoidance early morning slots worked perfectly — keep using them",
+          "Budget an extra 20% for shopping — you overspent every trip"
+        ]
+      }
+    }
+    ```
+
+    **Layout:** vertical timeline with colored dots:
+    - 🟢 Green dot: positive change (worked out better)
+    - 🟡 Amber dot: neutral change (no better or worse)
+    - 🔴 Red dot: negative change (missed something / regret)
+
+    Each timeline entry shows: Day badge + what changed + why + lesson learned
+
+    **Planning Lessons section** at the bottom — AI-generated summary of patterns:
+    ```
+    ┌── Lessons for Next Trip ───────────────────┐
+    │                                             │
+    │ 📝 Based on this trip's changes:            │
+    │                                             │
+    │ 1. Leave 2-3hr buffer per day for           │
+    │    spontaneous finds — your best moments    │
+    │    were unplanned                           │
+    │                                             │
+    │ 2. Weather backup plan saved you twice —    │
+    │    always prep indoor alternatives          │
+    │                                             │
+    │ 3. Shopping days = max 3 attractions.       │
+    │    You skipped evening plans on all         │
+    │    shopping days due to fatigue.            │
+    │                                             │
+    │ 4. Crowd-avoidance early morning slots      │
+    │    worked perfectly (Gamcheon 08:00 was     │
+    │    empty). Keep this strategy.              │
+    │                                             │
+    │ 5. Budget 20% more for shopping —           │
+    │    you overspent this category by NT$4,500  │
+    │                                             │
+    └─────────────────────────────────────────────┘
+    ```
+
+    **How changelog data is collected:**
+    - During the trip, the user can modify the calendar (drag events, add/remove).
+    - Each modification is logged with a timestamp and auto-categorized reason
+    - The `retro.changelog` is auto-populated by comparing `schedule` (original plan)
+      with `schedule_actual` (what really happened, updated via calendar drag-and-drop)
+    - If no modifications are made, the changelog shows: "You stuck to the plan perfectly!"
+    - `retro.planning_lessons` are generated by the AI based on patterns in the changelog
+
 ### CRITICAL: Every Tab Must Be Fully Populated
 
 **NEVER generate placeholder content, empty shells, or "TODO" sections.**
@@ -2388,6 +3016,15 @@ The generated HTML must include ALL of these content sections, distributed acros
 Every tab must contain REAL, complete data from the research phases:
 
 - **Attractions tab**: ALL POIs with real names, addresses, prices, hours, Google Maps links
+
+  **POI Completeness Rule (mandatory):** Every **named place** that appears in `schedule[].events[]` — restaurants, cafés, temples, parks, shopping spots, anything with a proper name — MUST have a corresponding entry in `pois[]` with accurate `lat`/`lng`. The map and POI list are driven exclusively by `pois[]`; if a place is only in the schedule events but not in `pois[]`, it will be **invisible on the map**.
+
+  Enforcement checklist when editing the itinerary:
+  1. Scan every schedule event that has `"restaurant"`, `"map"`, or a named `"name"` field
+  2. Verify a matching `id` exists in `pois[]`
+  3. If missing → add a new POI entry immediately with `lat`, `lng`, `cat`, `city`, `desc`, `addr`
+  4. Use IDs that group logically: `fc1`–`fcN` for city cafés, `j1`–`jN` for new region spots, etc.
+
 - **Calendar tab**: ALL 14 days with every event, transit, meal, and work block filled in
 - **Booking tab**: ALL purchased items with links, ALL price comparisons with real URLs
 - **Expenses tab**: ALL cost items with real prices, working currency switcher, estimated/actual toggle, `purchased` flags on pre-bought items, `city` field on actual expense items
