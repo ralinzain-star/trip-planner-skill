@@ -152,7 +152,8 @@ Example for a Taiwanese user visiting Korea & Japan: `zh`, `en`, `ko`, `ja`
    `getField(changelog, 'lesson')`, `getField(dining, 'party_label')`, etc.
    This replaces all `isZh ? x.reason : x.reason_en` patterns.
 
-7. **`applyLang()` function** -- called on language switch, MUST:
+7. **`applyLang()` function** -- called on language switch AND on init (in `DOMContentLoaded`), MUST:
+   - Auto-switch currency via `LANG_CURR_MAP` (see Currency rule above)
    - Update all `[data-i18n]` elements
    - Re-render POI list (`renderPOIs`)
    - Re-render calendar (`renderCalendar`) -- always, not just when active
@@ -160,7 +161,10 @@ Example for a Taiwanese user visiting Korea & Japan: `zh`, `en`, `ko`, `ja`
    - Update clocks (`updateClocks`)
    - Update any other dynamic content
 
-8. **Language switcher UI** -- a menu accessible from both sidebar and bottom bar, showing all 4 languages
+   **CRITICAL:** `applyLang()` MUST be called during `DOMContentLoaded` init, AFTER all render functions are initialized. Without this, the HTML will show hardcoded Chinese text even when `currentLang` is set to a different language. Add `safe('applyLang', applyLang);` near the end of the init block.
+
+8. **Language switcher UI** -- a menu accessible from both sidebar and bottom bar, showing all 4 languages.
+   The `LANGS` array order determines the menu display order. **The default language (matching `currentLang`) MUST be first** in the array so it appears at the top of the language menu.
 
 #### Fonts (MANDATORY)
 
@@ -242,13 +246,26 @@ The calendar renderer shows this info:
 **Currency rule: the currency switcher buttons are determined by the user's nationality and the trip's destination countries.**
 - Include ONLY: **user's home currency** (from passport/nationality) + **each destination country's currency**
 - Do NOT include USD unless the user is American or a destination uses USD
-- Default display = home currency
+- Default display = matches the default language (see LANG_CURR_MAP below)
 - Example: Taiwanese user going to Korea + Japan -> pills: TWD / KRW / JPY (no USD)
 - Example: American user going to Japan -> pills: USD / JPY
 - Example: Japanese user going to Korea + Taiwan -> pills: JPY / KRW / TWD
 - Multi-destination trips include all destination currencies (e.g., Korea->Japan = KRW + JPY)
 - All prices throughout the HTML show **destination currency (home currency equivalent)**
   e.g., "W3,000 (NT$64)" or "Y1,500 (NT$300)"
+
+**Auto-switch currency with language (MANDATORY):**
+When the user switches language, the currency MUST auto-switch to the corresponding currency. Implement via a `LANG_CURR_MAP` and apply it in `applyLang()`:
+```js
+const LANG_CURR_MAP = { zh:'TWD', en:'USD', ko:'KRW', ja:'JPY' };
+// In applyLang():
+var mapped = LANG_CURR_MAP[currentLang] || 'TWD';
+if (currentCurr !== mapped) {
+  currentCurr = mapped;
+  document.querySelectorAll('.curr-btn').forEach(b => b.classList.toggle('on', b.dataset.curr === currentCurr));
+}
+```
+Adjust `LANG_CURR_MAP` values based on the actual trip currencies. If a language maps to a currency not in the switcher pills, map it to the closest relevant currency.
 
 ---
 
@@ -510,10 +527,17 @@ Expenses Tab:
   - Label changes per mode: "Estimated Total" / "Actual Total"
 - City cost ratio: horizontal bars (always visible in both modes)
 - Category breakdown: horizontal bars sorted by highest spend, colored per category
+  - `budgetCatColorMap` MUST include ALL categories that appear in budget data, including `cafe`.
+    Missing categories fall back to a 📌 emoji which looks broken. Required entries:
+    `hotel`, `food`, `transport`, `attraction`, `shopping`, `cafe`, `other`, `personal`
+  - Similarly, `catIconMap` in `renderBudgetActual()` must include `cafe:'local_cafe'`
 - Detail list:
   - Estimated mode: flat rows (item + city + cost), no checkboxes
   - Actual mode: "Pre-purchased" group (budget items with purchased:true) + per-date groups with day totals
 - All changes immediately update totals and charts when switching modes or currency
+- **Stats card (`stat-total`) MUST always show actual spending** (not estimated) when actual data exists.
+  Both `renderBudgetEstimated()` and `renderBudgetActual()` update `stat-total`, so `renderBudgetEstimated()`
+  must call `getActualTotal()` and display that if > 0, falling back to the estimated total otherwise.
 
 POI / Attractions Tab:
 - Click POI -> opens a **detail modal popup** with:
