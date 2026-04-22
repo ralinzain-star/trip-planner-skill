@@ -12,7 +12,7 @@
       "name": "trip-planner-skill",
       "description": "Research, plan, generate HTML travel guides, and deploy -- includes trip planner, travel collector, flight intelligence, UI styles, HTML generator, and deployer.",
       "source": "./",
-      "strict": false,
+      "strict": true,
       "skills": [
         "./skills/trip-planner",
         "./skills/travel-collector",
@@ -20,7 +20,8 @@
         "./skills/trip-html-generator",
         "./skills/ui-style",
         "./skills/trip-deployer"
-      ]
+      ],
+      "agents": ["./agents/trip-planner-agent.md"]
     }
   ]
 }
